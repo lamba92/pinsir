@@ -2,7 +2,8 @@ rootProject.name = "face-detector-stack"
 
 include(
     "detection",
-    "extraction"
+    "extraction",
+    "embedding"
 )
 
 //if (file("../mtcnn-java").run { isDirectory })

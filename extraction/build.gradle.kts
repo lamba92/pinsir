@@ -1,7 +1,7 @@
 import com.github.lamba92.gradle.utils.*
 
 plugins {
-//    id("com.palantir.docker")
+    id("com.palantir.docker")
     kotlin("plugin.serialization")
     kotlin("jvm")
     application
@@ -44,8 +44,17 @@ kotlin {
     }
 }
 
+docker {
+    name = "${rootProject.name}/${project.name}:${project.version}"
+    files(tasks.installDist.get().outputs)
+    buildArgs(mapOf("APP_NAME" to project.name))
+}
+
 tasks {
     withType<Test> {
         useJUnitPlatform()
+    }
+    dockerPrepare {
+        dependsOn(installDist)
     }
 }

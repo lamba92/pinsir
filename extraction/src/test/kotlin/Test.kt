@@ -1,10 +1,10 @@
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
-import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import java.io.File
 import java.util.*
 import kotlin.test.Test
 import kotlin.test.assertNotNull
@@ -26,8 +26,8 @@ class Test {
     private fun getAnnotations() = Thread.currentThread().contextClassLoader
         .getResourceAsStream("annotation.json")!!
         .readBytes()
-        .toString()
-        .let { serializer.decodeFromString(ListSerializer(FaceAnnotationRequest.serializer()), it) }
+        .let { String(it) }
+        .let { serializer.decodeFromString<List<FaceAnnotationRequest>>(it) }
 
     @Test
     fun testImage(): Unit = withTestApplication(Application::extractionModule) {
@@ -36,11 +36,10 @@ class Test {
             addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
         }
         assertNotNull(call.response.content)
-        println(call.response.content)
+        File("out.json").writeText(call.response.content!!)
     }
 
     private fun ExtractionRequest.toJson() =
         serializer.encodeToString(this)
-
 
 }

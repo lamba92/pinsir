@@ -12,6 +12,8 @@ import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.withContext
 import java.util.*
 import javax.imageio.ImageIO
+import kotlin.math.max
+import kotlin.math.min
 
 fun Application.extractionModule() {
 
@@ -34,7 +36,11 @@ fun Application.extractionModule() {
                 annotations.asFlow()
                     .mapWithContext(Dispatchers.IO) {
                         it to with(it.box) {
-                            decodedImage.getSubimage(x, y, width, height)!!
+                            val newX = max(0, x - 20)
+                            val newY = max(0, y - 20)
+                            val newW = min(x + width + 20, decodedImage.width) - newX
+                            val newH = min(y + height + 20, decodedImage.height) - newY
+                            decodedImage.getSubimage(newX, newY, newW, newH)!!
                         }
                     }
                     .mapWithContext(Dispatchers.IO) { (annotation, bufferedImage) ->

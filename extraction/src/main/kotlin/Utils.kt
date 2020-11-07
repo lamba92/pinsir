@@ -12,6 +12,11 @@ inline fun <T, R> Flow<T>.mapWithContext(
     crossinline transform: suspend (value: T) -> R
 ) = map { withContext(context) { transform(it) } }
 
+suspend inline fun <T, R> Iterable<T>.mapWithContext(
+    context: CoroutineContext,
+    crossinline transform: suspend (value: T) -> R
+) = map { withContext(context) { transform(it) } }
+
 fun BufferedImage.toBase64Jpg(b64Encoder: Base64.Encoder) =
     ByteArrayOutputStream()
         .also { ImageIO.write(this, "jpg", it) }

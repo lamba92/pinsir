@@ -5,5 +5,9 @@ import io.ktor.util.*
 
 @KtorExperimentalAPI
 fun main() {
-    embeddedServer(CIO, port = 8081, module = Application::extractionModule).start(true)
+    embeddedServer(
+        factory = CIO,
+        port = System.getenv("SERVER_PORT")?.toInt() ?: 8081,
+        module = Application::extractionModule
+    ).start(true)
 }
