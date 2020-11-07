@@ -1,4 +1,5 @@
 import tensorflow as tf
+import logging
 
 from detector_app import DetectorApp
 
@@ -11,3 +12,4 @@ except:
     pass
 
 app = DetectorApp(__name__)
+logging.getLogger('flask_cors').level = logging.DEBUG
