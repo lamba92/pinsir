@@ -1,12 +1,10 @@
-import json
-
-import cv2
-import numpy as np
 import base64
+import json
+from io import BytesIO
 
-import tensorflow
+import numpy as np
+from PIL import Image
 from flask import Flask, request
-from flask_cors import CORS
 from keras_vggface import VGGFace
 from keras_vggface.utils import preprocess_input
 
@@ -35,17 +33,15 @@ class EmbedderApp(Flask):
     # example: { "image": "base64EncodedImage" }
     def embed(self):
         b_64_image = request.get_json()["image"]
-        image = tensorflow.io.decode_base64(b_64_image)
-        image = tensorflow.io.decode_jpeg(image, channels=3)
-        image = tensorflow.image.resize(
-            image=image,
-            size=(224, 224),
-            method=tensorflow.image.ResizeMethod.BILINEAR,
-            align_corners=False
-        )
+        image = base64.b64decode(b_64_image)
+        image = BytesIO(image)
+        image = Image.open(image)
+        image = image.resize((224, 224))
+        image = np.asarray(image).astype(np.float32)
+        image = np.expand_dims(image, axis=0)
         image = preprocess_input(image, version=2)
 
         return json.dumps({
             "image": b_64_image,
-            "vector": self.model.predict(image)[0]
+            "vector": self.model.predict(image)[0].tolist()
         })

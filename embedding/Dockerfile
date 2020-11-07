@@ -1,7 +1,7 @@
 FROM tensorflow/tensorflow:2.4.0rc0-gpu
 
 RUN apt install libgl1-mesa-glx git --no-install-recommends -y
-RUN pip install keras_applications opencv-python flask flask-cors git+https://github.com/rcmalli/keras-vggface.git
+RUN pip install keras_applications flask flask-cors git+https://github.com/rcmalli/keras-vggface.git
 
 ADD . .
 

@@ -40,7 +40,8 @@ fun Application.extractionModule() {
                             val newY = max(0, y - 20)
                             val newW = min(x + width + 20, decodedImage.width) - newX
                             val newH = min(y + height + 20, decodedImage.height) - newY
-                            decodedImage.getSubimage(newX, newY, newW, newH)!!
+                            val edge = min(newH, newW)
+                            decodedImage.getSubimage(newX, newY, edge, edge)!!
                         }
                     }
                     .mapWithContext(Dispatchers.IO) { (annotation, bufferedImage) ->
