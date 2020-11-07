@@ -1,13 +1,9 @@
 import io.ktor.application.*
-import io.ktor.features.*
-import io.ktor.serialization.*
+import io.ktor.server.cio.*
+import io.ktor.server.engine.*
+import io.ktor.util.*
 
-class FaceAnnotation(box: List<Int>,) {
-
-}
-
-fun Application.extractionModule() {
-    install(ContentNegotiation) {
-        json()
-    }
+@KtorExperimentalAPI
+fun main() {
+    embeddedServer(CIO, port = 8081, module = Application::extractionModule).start(true)
 }

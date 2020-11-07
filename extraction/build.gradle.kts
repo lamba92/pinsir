@@ -1,7 +1,8 @@
-import com.github.lamba92.gradle.utils.ktor
+import com.github.lamba92.gradle.utils.*
 
 plugins {
-    id("com.palantir.docker")
+//    id("com.palantir.docker")
+    kotlin("plugin.serialization")
     kotlin("jvm")
     application
 }
@@ -18,12 +19,33 @@ kotlin {
         }
     }
     sourceSets {
+
+        val ktorVersion: String by project
+        val kotlinxSerializationVersion: String by project
+        val logbackVersion: String by project
+        val jupyterVersion: String by project
+
         main {
             dependencies {
-                val ktorVersion: String by project
                 implementation(ktor("server-cio", ktorVersion))
                 implementation(ktor("serialization", ktorVersion))
+                implementation(kotlinx("serialization-json", kotlinxSerializationVersion))
+                implementation("ch.qos.logback", "logback-classic", logbackVersion)
             }
         }
+        test {
+            dependencies {
+                implementation(kotlin("test-junit5"))
+                implementation(ktor("server-test-host", ktorVersion))
+                implementation("org.junit.jupiter", "junit-jupiter-api", jupyterVersion)
+                implementation("org.junit.jupiter", "junit-jupiter-engine", jupyterVersion)
+            }
+        }
+    }
+}
+
+tasks {
+    withType<Test> {
+        useJUnitPlatform()
     }
 }
