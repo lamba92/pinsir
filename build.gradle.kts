@@ -7,6 +7,7 @@ subprojects {
     repositories {
         jcenter()
         mavenCentral()
+        maven("https://dl.bintray.com/lamba92/com.github.lamba92")
     }
 }
 

@@ -1,14 +1,13 @@
 rootProject.name = "face-detector-stack"
 
-include(
-    "detection",
-    "extraction",
-    "embedding"
+val services = arrayOf(
+    ":detection",
+    ":extraction",
+    ":embedding"
 )
 
-//if (file("../mtcnn-java").run { isDirectory })
-//    includeBuild("../mtcnn-java") {
-//        dependencySubstitution {
-//            substitute(module("net.tzolov.cv:mtcnn")).with(project(":"))
-//        }
-//    }
+include(*services, ":data", ":query-builder")
+
+services.forEach {
+    project(it).projectDir = file("./services/${it.removePrefix(":")}")
+}

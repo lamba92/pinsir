@@ -1,3 +1,5 @@
+import com.github.lamba92.fds.detection.DetectionResponseItem
+import com.github.lamba92.fds.extraction.ExtractionRequest
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
@@ -11,15 +13,11 @@ import kotlin.test.assertNotNull
 
 class Test {
 
-    private val b64Encoder by lazy { Base64.getEncoder()!! }
-
-    private val serializer = Json(from= Json.Default) {
-        prettyPrint = true
-    }
+    private val b64Encoder = Base64.getEncoder()!!
 
     private fun getImage() =
-        Thread.currentThread().contextClassLoader
-            .getResourceAsStream("test2.jpg")!!
+        (Thread.currentThread().contextClassLoader
+            .getResourceAsStream("test2.jpg") ?: throw IllegalArgumentException("resource test2,jpg not found"))
             .readBytes()
             .let { b64Encoder.encodeToString(it)!! }
 
@@ -27,12 +25,12 @@ class Test {
         .getResourceAsStream("annotation.json")!!
         .readBytes()
         .let { String(it) }
-        .let { serializer.decodeFromString<List<FaceAnnotationRequest>>(it) }
+        .let { Json.decodeFromString<List<DetectionResponseItem.FaceAnnotation>>(it) }
 
     @Test
     fun testImage(): Unit = withTestApplication(Application::extractionModule) {
         val call = handleRequest(HttpMethod.Post, "extract") {
-            setBody(listOf(ExtractionRequest(getImage(), getAnnotations())).toJson())
+            setBody(ExtractionRequest(getImage(), getAnnotations()).toJson())
             addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
         }
         assertNotNull(call.response.content)
@@ -40,10 +38,7 @@ class Test {
     }
 
     private fun ExtractionRequest.toJson() =
-        serializer.encodeToString(this)
-
-    private inline fun <reified E> List<E>.toJson() =
-        serializer.encodeToString(this)
+        Json.encodeToString(this)
 
 }
 

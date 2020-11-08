@@ -4,7 +4,7 @@ from io import BytesIO
 
 import numpy as np
 from PIL import Image
-from flask import Flask, request
+from flask import Flask, request, Response
 from keras_vggface import VGGFace
 from keras_vggface.utils import preprocess_input
 
@@ -37,22 +37,14 @@ class EmbedderApp(Flask):
         image = image.resize((224, 224))
         image = np.asarray(image).astype(np.float32)
         image = np.expand_dims(image, axis=0)
-        return {
-            "image": b_64_image,
-            "input": preprocess_input(image, version=2)
-        }
+        return preprocess_input(image, version=2)
 
     def embed(self):
-        elaborated = list(map(self.elaborate_image, request.get_json()))
-        inputs = np.concatenate(list(map(lambda i: i["input"], elaborated)), axis=0)
-        predictions = self.model.predict(inputs)
-        r = []
-        images = list(map(lambda e: e["image"], elaborated))
-        predictions_list = predictions.tolist()
-        zipped = list(zip(images, predictions_list))
-        for b_64_image, prediction in zipped:
-            r.append({
-                "image": b_64_image,
-                "featureVector": prediction
-            })
-        return json.dumps(r)
+        inputs = request.get_json()
+        inputs = map(self.elaborate_image, inputs)
+        inputs = list(inputs)
+        inputs = np.concatenate(inputs, axis=0)
+        predictions = self.model.predict(inputs).tolist()
+        re = Response(json.dumps(predictions))
+        re.headers["Content-Type"] = "application/json"
+        return re
