@@ -30,18 +30,29 @@ class EmbedderApp(Flask):
         self.model = VGGFace(model='resnet50', include_top=False, input_shape=(224, 224, 3), pooling='avg')
         self.route('/embed', methods=['post'])(self.embed)
 
-    # example: { "image": "base64EncodedImage" }
-    def embed(self):
-        b_64_image = request.get_json()["image"]
+    def elaborate_image(self, b_64_image):
         image = base64.b64decode(b_64_image)
         image = BytesIO(image)
         image = Image.open(image)
         image = image.resize((224, 224))
         image = np.asarray(image).astype(np.float32)
         image = np.expand_dims(image, axis=0)
-        image = preprocess_input(image, version=2)
-
-        return json.dumps({
+        return {
             "image": b_64_image,
-            "vector": self.model.predict(image)[0].tolist()
-        })
+            "input": preprocess_input(image, version=2)
+        }
+
+    def embed(self):
+        elaborated = list(map(self.elaborate_image, request.get_json()))
+        inputs = np.concatenate(list(map(lambda i: i["input"], elaborated)), axis=0)
+        predictions = self.model.predict(inputs)
+        r = []
+        images = list(map(lambda e: e["image"], elaborated))
+        predictions_list = predictions.tolist()
+        zipped = list(zip(images, predictions_list))
+        for b_64_image, prediction in zipped:
+            r.append({
+                "image": b_64_image,
+                "featureVector": prediction
+            })
+        return json.dumps(r)

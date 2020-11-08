@@ -2,9 +2,11 @@ import json
 
 import cv2
 import numpy as np
+from PIL import Image
 from flask import Flask, request
-from flask_cors import CORS
+from io import BytesIO
 from mtcnn import MTCNN
+import base64
 
 
 class DetectorApp(Flask):
@@ -25,14 +27,21 @@ class DetectorApp(Flask):
     ):
         super().__init__(import_name, static_url_path, static_folder, static_host, host_matching, subdomain_matching,
                          template_folder, instance_path, instance_relative_config, root_path)
-        CORS(self)
         self.detector = MTCNN()
-        self.route('/detect', methods=['post', 'get'])(self.detect)
+        self.route('/detect', methods=['post', 'get'])(self.detect2)
 
-    def detect(self):
-        img_str = request.get_data()
-        np_image = np.fromstring(img_str, np.uint8)
-        decoded = cv2.imdecode(np_image, cv2.COLOR_BGR2RGB)
-        image = cv2.cvtColor(decoded, cv2.COLOR_BGR2RGB)
-        annotations = self.detector.detect_faces(image)
-        return json.dumps(annotations)
+    def process_image(self, b_64_image):
+        im = base64.b64decode(b_64_image)
+        im = BytesIO(im)
+        im = Image.open(im)
+        im = np.asarray(im).astype(np.float32)
+        annotations = self.detector.detect_faces(im)
+        return {
+            "image": b_64_image,
+            "annotations": annotations
+        }
+
+    def detect2(self):
+        b_64_images = request.get_json()
+        annotations_list = map(self.process_image, b_64_images)
+        return json.dumps(list(annotations_list))

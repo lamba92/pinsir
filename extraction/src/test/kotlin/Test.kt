@@ -32,7 +32,7 @@ class Test {
     @Test
     fun testImage(): Unit = withTestApplication(Application::extractionModule) {
         val call = handleRequest(HttpMethod.Post, "extract") {
-            setBody(ExtractionRequest(getImage(), getAnnotations()).toJson())
+            setBody(listOf(ExtractionRequest(getImage(), getAnnotations())).toJson())
             addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
         }
         assertNotNull(call.response.content)
@@ -42,4 +42,9 @@ class Test {
     private fun ExtractionRequest.toJson() =
         serializer.encodeToString(this)
 
+    private inline fun <reified E> List<E>.toJson() =
+        serializer.encodeToString(this)
+
 }
+
+

@@ -29,31 +29,38 @@ fun Application.extractionModule() {
     routing {
         contentType(ContentType.Application.Json) {
             post("extract") {
-                val (image, annotations) = call.receive<ExtractionRequest>()
-                val decodedImage = withContext(Dispatchers.IO) {
-                    b64Decoder.decode(image).let { ImageIO.read(it.inputStream()) }!!
-                }
-                annotations.asFlow()
-                    .mapWithContext(Dispatchers.IO) {
-                        it to with(it.box) {
-                            val newX = max(0, x - 20)
-                            val newY = max(0, y - 20)
-                            val newW = min(x + width + 20, decodedImage.width) - newX
-                            val newH = min(y + height + 20, decodedImage.height) - newY
-                            val edge = min(newH, newW)
-                            decodedImage.getSubimage(newX, newY, edge, edge)!!
-                        }
-                    }
-                    .mapWithContext(Dispatchers.IO) { (annotation, bufferedImage) ->
-                        annotation to bufferedImage.toBase64Jpg(b64Encoder)
-                    }
-                    .map { (annotation, encodedImage) ->
-                        ExtractionResponse.AnnotatedImage(encodedImage, annotation)
-                    }
+                val response = call.receive<List<ExtractionRequest>>()
+                    .asFlow()
+                    .map { it.elaborate(b64Decoder, b64Encoder) }
                     .toList()
-                    .let { ExtractionResponse(image, it) }
-                    .also { call.respond(it) }
+                call.respond(response)
             }
         }
     }
+}
+
+suspend fun ExtractionRequest.elaborate(b64Decoder: Base64.Decoder, b64Encoder: Base64.Encoder): ExtractionResponse {
+    val (image, annotations) = this
+    val decodedImage = withContext(Dispatchers.IO) {
+        b64Decoder.decode(image).let { ImageIO.read(it.inputStream()) }!!
+    }
+    return annotations.asFlow()
+        .mapWithContext(Dispatchers.IO) {
+            it to with(it.box) {
+                val newX = max(0, x - 20)
+                val newY = max(0, y - 20)
+                val newW = min(x + width + 20, decodedImage.width) - newX
+                val newH = min(y + height + 20, decodedImage.height) - newY
+                val edge = min(newH, newW)
+                decodedImage.getSubimage(newX, newY, edge, edge)!!
+            }
+        }
+        .mapWithContext(Dispatchers.IO) { (annotation, bufferedImage) ->
+            annotation to bufferedImage.toBase64Jpg(b64Encoder)
+        }
+        .map { (annotation, encodedImage) ->
+            ExtractionResponse.AnnotatedImage(encodedImage, annotation)
+        }
+        .toList()
+        .let { ExtractionResponse(image, it) }
 }

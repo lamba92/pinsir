@@ -1,6 +1,8 @@
 import tensorflow as tf
 import logging
 
+from flask_cors import CORS
+
 from detector_app import DetectorApp
 
 try:
@@ -12,4 +14,8 @@ except:
     pass
 
 app = DetectorApp(__name__)
+CORS(app)
 logging.getLogger('flask_cors').level = logging.DEBUG
+
+if __name__ == '__main__':
+    app.run(host="localhost", port=8080)
