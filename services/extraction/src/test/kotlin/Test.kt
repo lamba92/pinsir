@@ -1,3 +1,4 @@
+import Test.Companion.getImage
 import com.github.lamba92.fds.detection.DetectionResponseItem
 import com.github.lamba92.fds.extraction.ExtractionRequest
 import io.ktor.application.*
@@ -13,19 +14,22 @@ import kotlin.test.assertNotNull
 
 class Test {
 
-    private val b64Encoder = Base64.getEncoder()!!
+    companion object {
+        val b64Encoder = Base64.getEncoder()!!
 
-    private fun getImage() =
-        (Thread.currentThread().contextClassLoader
-            .getResourceAsStream("test2.jpg") ?: throw IllegalArgumentException("resource test2,jpg not found"))
+        fun getImage() =
+            (Thread.currentThread().contextClassLoader
+                .getResourceAsStream("test2.jpg") ?: throw IllegalArgumentException("resource test2.jpg not found"))
+                .readBytes()
+                .let { b64Encoder.encodeToString(it)!! }
+
+        fun getAnnotations() = Thread.currentThread().contextClassLoader
+            .getResourceAsStream("annotation.json")!!
             .readBytes()
-            .let { b64Encoder.encodeToString(it)!! }
+            .let { String(it) }
+            .let { Json.decodeFromString<List<DetectionResponseItem.FaceAnnotation>>(it) }
+    }
 
-    private fun getAnnotations() = Thread.currentThread().contextClassLoader
-        .getResourceAsStream("annotation.json")!!
-        .readBytes()
-        .let { String(it) }
-        .let { Json.decodeFromString<List<DetectionResponseItem.FaceAnnotation>>(it) }
 
     @Test
     fun testImage(): Unit = withTestApplication(Application::extractionModule) {
@@ -41,5 +45,3 @@ class Test {
         Json.encodeToString(this)
 
 }
-
-

@@ -6,6 +6,7 @@ import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.serialization.*
+import io.ktor.util.*
 import it.lamba.ktor.utils.AllHeaders
 import it.lamba.ktor.utils.any
 import kotlinx.coroutines.flow.asFlow
@@ -42,7 +43,8 @@ fun Application.extractionModule() {
 
     install(StatusPages) {
         exception<Throwable> {
-            call.respond(mapOf(
+            log.error(it)
+            call.respond(HttpStatusCode.InternalServerError, mapOf(
                 "error" to it.message,
                 "stack" to it.stackTrace.map { it.toString() }.let { Json.encodeToString(it) }
             ))
