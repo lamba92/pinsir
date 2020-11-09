@@ -19,13 +19,17 @@ import io.ktor.serialization.*
 import io.ktor.util.*
 import it.lamba.ktor.utils.AllHeaders
 import it.lamba.ktor.utils.any
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.flow.toList
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.slf4j.event.Level
 import java.lang.System.getenv
 import java.util.*
+import kotlin.collections.flatMap
+import kotlin.collections.map
+import kotlin.collections.zip
 
 @Suppress("LocalVariableName")
 @KtorExperimentalAPI
@@ -41,18 +45,21 @@ fun Application.queryBuilderModule() {
 
     val b64Encoder by lazy { Base64.getEncoder()!! }
 
-    val DETECTOR_HOSTNAME: String = envOrThrow("DETECTOR_HOSTNAME", "http://localhost:8080")
-    val EXTRACTOR_HOSTNAME: String = envOrThrow("EXTRACTOR_HOSTNAME", "http://localhost:8081")
-    val EMBEDDER_HOSTNAME: String = envOrThrow("EMBEDDER_HOSTNAME", "http://localhost:8082")
+    val DETECTOR_HOSTNAME: String = envOrThrow("DETECTOR_HOSTNAME")
+    val EXTRACTOR_HOSTNAME: String = envOrThrow("EXTRACTOR_HOSTNAME")
+    val EMBEDDER_HOSTNAME: String = envOrThrow("EMBEDDER_HOSTNAME")
 
-    suspend fun HttpClient.elaborateImage(b64Images: List<String>) =
+    suspend fun HttpClient.elaborateImage(b64Images: List<String>, facesPerImage: Int = 0) =
         post<DetectionResponse>("$DETECTOR_HOSTNAME/detect") {
             header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
             body = b64Images
         }
             .asFlow()
             .map { (image, annotations) ->
-                ExtractionRequest(image, annotations)
+                ExtractionRequest(
+                    image,
+                    annotations.subList(0, if (facesPerImage > 0) facesPerImage else annotations.size)
+                )
             }
             .toList()
             .let { request ->
@@ -73,8 +80,8 @@ fun Application.queryBuilderModule() {
                 PortraitWithEmbedding(image, embedding)
             }
 
-    suspend fun HttpClient.elaborateImage(vararg b64Images: String) =
-        elaborateImage(b64Images.toList())
+    suspend fun HttpClient.elaborateImage(vararg b64Images: String, facesPerImage: Int = 0) =
+        elaborateImage(b64Images.toList(), facesPerImage)
 
     install(CallLogging) {
         level = Level.DEBUG
@@ -92,6 +99,14 @@ fun Application.queryBuilderModule() {
     install(ContentNegotiation) {
         json()
     }
+    install(StatusPages) {
+        exception<Throwable> {
+            call.respond(mapOf(
+                "error" to it.message,
+                "stack" to it.stackTrace.map { it.toString() }.let { Json.encodeToString(it) }
+            ))
+        }
+    }
 
     routing {
         route("elaborate") {
@@ -106,11 +121,15 @@ fun Application.queryBuilderModule() {
                     .let { httpClient.elaborateImage(it) }
                     .let { call.respond(it) }
             }
+            post("embeddingOnly") {
+                call.receive<List<String>>()
+                    .let { httpClient.elaborateImage(it, call.parameters["facesPerImage"]?.toInt() ?: 0) }
+                    .map { it.embedding }
+                    .let { call.respond(it) }
+            }
         }
 
     }
-
-
 }
 
 @Serializable
@@ -141,6 +160,6 @@ fun envOrThrow(
     name: String,
     default: String? = null
 ) =
-    getenv("EXTRACTOR_HOSTNAME")
+    getenv(name)
         ?: default
         ?: throw IllegalArgumentException("$name not found in environment")

@@ -10,7 +10,7 @@ plugins {
 }
 
 var mainClassName: String by application.mainClass
-mainClassName = "MainKt"
+mainClassName = "com.github.lamba92.fds.MainKt"
 
 kotlin {
 
@@ -53,8 +53,17 @@ kotlin {
 
 }
 
+docker {
+    name = "${rootProject.name}/${project.name}:${project.version}"
+    files(tasks.installDist.get().outputs)
+    buildArgs(mapOf("APP_NAME" to project.name))
+}
+
 tasks {
     withType<Test> {
         useJUnitPlatform()
+    }
+    dockerPrepare {
+        dependsOn(installDist)
     }
 }

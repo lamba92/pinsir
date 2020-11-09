@@ -23,12 +23,14 @@ kotlin {
         val ktorVersion: String by project
         val logbackVersion: String by project
         val jupyterVersion: String by project
+        val ktorCorsAnyVersion: String by project
 
         main {
             dependencies {
                 implementation(project(":data"))
                 implementation(ktor("server-cio", ktorVersion))
                 implementation(ktor("serialization", ktorVersion))
+                implementation(lamba("ktor-cors-any", ktorCorsAnyVersion))
                 implementation("ch.qos.logback", "logback-classic", logbackVersion)
             }
         }

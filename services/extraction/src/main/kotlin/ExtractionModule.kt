@@ -6,9 +6,14 @@ import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.serialization.*
+import it.lamba.ktor.utils.AllHeaders
+import it.lamba.ktor.utils.any
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import org.slf4j.event.Level
 import java.util.*
 
 fun Application.extractionModule() {
@@ -20,7 +25,29 @@ fun Application.extractionModule() {
         json()
     }
 
-    install(CallLogging)
+    install(CallLogging) {
+        level = Level.DEBUG
+    }
+
+    install(CORS) {
+        any()
+        allowSameOrigin = true
+        allowCredentials = true
+        allowNonSimpleContentTypes = true
+        allowXHttpMethodOverride()
+        HttpHeaders.AllHeaders.forEach {
+            exposeHeader(it)
+        }
+    }
+
+    install(StatusPages) {
+        exception<Throwable> {
+            call.respond(mapOf(
+                "error" to it.message,
+                "stack" to it.stackTrace.map { it.toString() }.let { Json.encodeToString(it) }
+            ))
+        }
+    }
 
     routing {
         contentType(ContentType.Application.Json) {
