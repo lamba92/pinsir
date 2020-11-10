@@ -4,7 +4,7 @@ plugins {
 
 docker {
     name = "${rootProject.name}/${project.name}:${project.version}"
-    files("embedder_app.py", "app.py", "build_vgg_cache.py")
+    files("src")
 }
 
 tasks {
@@ -14,5 +14,12 @@ tasks {
         context = file("$buildDir/docker")
         imageName = "lamba92/${rootProject.name}.${project.name}"
         publish = true
+    }
+    val generatePythonDefinitions by project(":data").tasks.getting(PythonProtoc::class)
+    register<Copy>("getGrpcDefinitions") {
+        group = "grpc"
+        dependsOn(generatePythonDefinitions)
+        from(generatePythonDefinitions.destinationDir)
+        into("src")
     }
 }

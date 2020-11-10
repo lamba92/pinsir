@@ -1,0 +1,23 @@
+syntax = "proto3";
+import "common.proto";
+
+service Extraction {
+  rpc extract(ExtractionRequest) returns (ExtractionResponse) {}
+}
+
+message ExtractionRequest {
+  string image = 1;
+  repeated FaceAnnotation annotations = 2;
+  bool squared = 3;
+  int32 padding = 4;
+}
+
+message ExtractionResponse {
+  string originalImage = 1;
+  repeated AnnotatedPortrait extracted = 2;
+
+  message AnnotatedPortrait {
+    string image = 1;
+    FaceAnnotation annotation = 2;
+  }
+}

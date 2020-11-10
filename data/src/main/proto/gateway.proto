@@ -1,0 +1,25 @@
+syntax = "proto3";
+import "common.proto";
+
+service Gateway {
+  rpc elaborate(GatewayRequest) returns (GatewayResponse) {}
+}
+
+message GatewayRequest {
+  repeated string images = 1;
+}
+
+message GatewayResponse {
+  repeated ImageWithExtractedData elements = 1;
+  message ImageWithExtractedData {
+
+      string originalImage = 1;
+      repeated PortraitWithEmbedding data = 2;
+
+      message PortraitWithEmbedding {
+        repeated double array = 1;
+        string faceImage = 2;
+        FaceAnnotation annotation = 3;
+      }
+  }
+}

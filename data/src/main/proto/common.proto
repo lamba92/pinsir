@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+message FaceAnnotation {
+
+  Box box = 1;
+  double confidence = 2;
+  Keypoints keypoints = 3;
+
+  message Box {
+    int32 x = 1;
+    int32 y = 2;
+    int32 width = 3;
+    int32 height = 4;
+  }
+
+  message Keypoints {
+    Point leftEye = 1;
+    Point rightEye = 2;
+    Point nose = 3;
+    Point mouthLeft = 4;
+    Point mouthRight = 5;
+  }
+
+}
+
+message Point {
+  int32 x = 1;
+  int32 y = 2;
+}

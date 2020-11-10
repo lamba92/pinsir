@@ -18,6 +18,7 @@ dependencies {
     val sshPluginVersion: String by project
     val dockerPluginVersion: String by project
     val lambaGradleUtilsVersion: String by project
+    val protobufPluginVersion: String by project
 
     api(kotlin("gradle-plugin", kotlinVersion))
     api(kotlin("serialization", kotlinVersion))
@@ -28,5 +29,6 @@ dependencies {
     api("org.hidetake", "gradle-ssh-plugin", sshPluginVersion)
     api("com.palantir.gradle.docker", "gradle-docker", dockerPluginVersion)
     api("com.github.lamba92", "lamba-gradle-utils", lambaGradleUtilsVersion)
+    api("com.google.protobuf", "protobuf-gradle-plugin", protobufPluginVersion)
 
 }

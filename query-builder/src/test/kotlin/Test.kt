@@ -1,28 +1,32 @@
-import com.github.lamba92.fds.queryBuilderModule
-import io.ktor.application.*
-import io.ktor.http.*
-import io.ktor.server.testing.*
-import io.ktor.util.*
-import io.ktor.utils.io.core.*
-import io.ktor.utils.io.jvm.javaio.*
-import java.io.File
-import java.lang.IllegalArgumentException
+@file:Suppress("TestFunctionName")
+
+import GatewayGrpcKt.GatewayCoroutineStub
+import GatewayOuterClass.GatewayRequest
+import io.grpc.ManagedChannelBuilder
+import kotlinx.coroutines.runBlocking
+import java.util.*
 import kotlin.test.Test
 
-@ExperimentalIoApi
-@KtorExperimentalAPI
 class TestFlow {
 
-    fun getImage() = Thread.currentThread().contextClassLoader
-        .getResourceAsStream("test2.jpg") ?: throw IllegalArgumentException("test2.jpg not found in resources")
+    private fun getImage() = (Thread.currentThread().contextClassLoader
+        .getResourceAsStream("test2.jpg") ?: throw IllegalArgumentException("test2.jpg not found in resources"))
+        .let { Base64.getEncoder().encodeToString(it.readBytes()) }
+
+    private val gatewayApp = ManagedChannelBuilder.forAddress("localhost", 50051)
+        .usePlaintext()
+        .maxInboundMessageSize(100.megabytes)
+        .build()
+        .let { GatewayCoroutineStub(it) }
 
     @Test
-    fun testFile(): Unit = withTestApplication(Application::queryBuilderModule) {
-        val call = handleRequest(HttpMethod.Post, "elaborate/file") {
-            bodyChannel = getImage().toByteReadChannel()
-        }
-        Thread.sleep(1000)
-        File("out.json").writeText(call.response.content!!)
+    fun testFile(): Unit = runBlocking {
+        gatewayApp.elaborate((0..15).map { getImage() })
     }
 
+    private fun GatewayRequest(images: List<String>) =
+        GatewayRequest.newBuilder().addAllImages(images).build()!!
+
+    private suspend fun GatewayCoroutineStub.elaborate(images: List<String>) =
+        elaborate(GatewayRequest(images))
 }

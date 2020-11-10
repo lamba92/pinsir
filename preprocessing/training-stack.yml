@@ -1,28 +1,21 @@
 version: "3.8"
 services:
   detection:
-    image: lamba92/face-detector-stack.detection:1.0-SNAPSHOT
-    deploy:
-      replicas: 5
+    image: face-detector-stack/detection:1.0-SNAPSHOT
 
   extraction:
-    image: lamba92/face-detector-stack.extraction:1.0-SNAPSHOT
+    image: face-detector-stack/extraction:1.0-SNAPSHOT
 
   embedding:
-    image: lamba92/face-detector-stack.embedding:1.0-SNAPSHOT
-    deploy:
-      replicas: 5
+    image: face-detector-stack/embedding:1.0-SNAPSHOT
 
   query-builder:
-    image: lamba92/face-detector-stack.query-builder:1.0-SNAPSHOT
+    image: face-detector-stack/query-builder:1.0-SNAPSHOT
     ports:
-      - target: 80
-        published: 8080
-        protocol: tcp
-        mode: ingress
+     - 50051:50051
     environment:
-      DETECTOR_HOSTNAME: "http://detection"
-      EXTRACTOR_HOSTNAME: "http://extraction"
-      EMBEDDER_HOSTNAME: "http://embedding"
+      DETECTOR_HOSTNAME: "detection:50051"
+      EXTRACTOR_HOSTNAME: "extraction:50051"
+      EMBEDDER_HOSTNAME: "embedding:50051"
 
 

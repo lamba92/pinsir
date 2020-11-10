@@ -2,10 +2,10 @@ FROM adoptopenjdk:8u262-b10-jdk-hotspot-bionic
 
 COPY . /app
 
-EXPOSE 80
+ENV PORT=50051
+EXPOSE 50051
 
 ARG APP_NAME
-ENV SERVER_PORT=80
 ENV PATH="$PATH:/app/bin"
 ENV RUN_COMMAND=$APP_NAME
 

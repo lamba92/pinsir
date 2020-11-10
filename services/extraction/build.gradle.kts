@@ -1,10 +1,12 @@
 import com.github.lamba92.gradle.utils.*
+import com.google.protobuf.gradle.*
 
 plugins {
     id("com.palantir.docker")
     kotlin("plugin.serialization")
     kotlin("jvm")
     application
+    id("com.google.protobuf")
 }
 
 var mainClassName: String by application.mainClass
@@ -20,24 +22,22 @@ kotlin {
     }
     sourceSets {
 
-        val ktorVersion: String by project
         val logbackVersion: String by project
         val jupyterVersion: String by project
-        val ktorCorsAnyVersion: String by project
+        val grpcKotlinVersion: String by project
+        val grpcJavaVersion: String by project
 
         main {
             dependencies {
                 implementation(project(":data"))
-                implementation(ktor("server-cio", ktorVersion))
-                implementation(ktor("serialization", ktorVersion))
-                implementation(lamba("ktor-cors-any", ktorCorsAnyVersion))
                 implementation("ch.qos.logback", "logback-classic", logbackVersion)
+
+
             }
         }
         test {
             dependencies {
                 implementation(kotlin("test-junit5"))
-                implementation(ktor("server-test-host", ktorVersion))
                 implementation("org.junit.jupiter", "junit-jupiter-api", jupyterVersion)
                 implementation("org.junit.jupiter", "junit-jupiter-engine", jupyterVersion)
             }
@@ -57,13 +57,5 @@ tasks {
     }
     dockerPrepare {
         dependsOn(installDist)
-    }
-    register<DockerBuildx>("dockerBuildx") {
-        dependsOn(dockerPrepare)
-        group = "docker"
-        context = file("$buildDir/docker")
-        imageName = "lamba92/${rootProject.name}.${project.name}"
-        buildArguments.set(mapOf("APP_NAME" to project.name))
-        publish = true
     }
 }

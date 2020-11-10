@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+service Embedding {
+  rpc embed(EmbeddingRequest) returns (EmbeddingResponse) {}
+}
+
+message EmbeddingRequest {
+  repeated string images = 1;
+}
+
+message EmbeddingResponse {
+
+  repeated Embedding results = 1;
+
+  message Embedding {
+    repeated double array = 1;
+  }
+
+}

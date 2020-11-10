@@ -1,0 +1,22 @@
+syntax = "proto3";
+import "common.proto";
+
+service Detection {
+  rpc detect(DetectionRequest) returns (DetectionResponse) {}
+}
+
+message DetectionRequest {
+  repeated string images = 1;
+}
+
+message DetectionResponse {
+
+  repeated Item items = 1;
+
+  message Item {
+    string image = 1;
+    repeated FaceAnnotation annotations = 2;
+  }
+
+}
+
