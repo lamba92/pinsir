@@ -9,7 +9,7 @@ Content-Type: application/json
 ]
 
 ### POST for all info nested
-POST localhost:8083/elaborate/embeddingOnly
+POST localhost:8080/elaborate/embeddingOnly
 Content-Type: application/json
 
 [

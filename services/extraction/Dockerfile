@@ -2,7 +2,7 @@ FROM adoptopenjdk:8u262-b10-jdk-hotspot-bionic
 
 COPY . /app
 
-EXPOSE 8080
+EXPOSE 80
 
 ARG APP_NAME
 ENV SERVER_PORT=80

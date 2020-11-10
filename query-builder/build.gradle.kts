@@ -66,4 +66,12 @@ tasks {
     dockerPrepare {
         dependsOn(installDist)
     }
+    register<DockerBuildx>("dockerBuildx") {
+        dependsOn(dockerPrepare)
+        group = "docker"
+        context = file("$buildDir/docker")
+        imageName = "lamba92/${rootProject.name}.${project.name}"
+        buildArguments.set(mapOf("APP_NAME" to project.name))
+        publish = true
+    }
 }

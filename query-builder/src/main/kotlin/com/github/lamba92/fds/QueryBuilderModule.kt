@@ -25,6 +25,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.slf4j.event.Level
+import java.lang.System.err
 import java.lang.System.getenv
 import java.util.*
 import kotlin.collections.flatMap
@@ -72,7 +73,7 @@ fun Application.queryBuilderModule() {
     }
     install(StatusPages) {
         exception<Throwable> {
-            log.error(it)
+            log.error(it.message)
             call.respond(HttpStatusCode.InternalServerError, mapOf(
                 "error" to it.message,
                 "stack" to it.stackTrace.map { it.toString() }.let { Json.encodeToString(it) }
@@ -90,7 +91,8 @@ fun Application.queryBuilderModule() {
                             listOf(it),
                             DETECTOR_HOSTNAME,
                             EXTRACTOR_HOSTNAME,
-                            EMBEDDER_HOSTNAME
+                            EMBEDDER_HOSTNAME,
+                            call.parameters["facesPerImage"]?.toInt() ?: 0
                         )
                     }
                     .let { call.respond(it) }
@@ -143,7 +145,7 @@ suspend fun HttpClient.elaborateImage(
     EMBEDDER_HOSTNAME: String,
     facesPerImage: Int = 0
 ) =
-    post<DetectionResponse>("$DETECTOR_HOSTNAME/detect") {
+    post<DetectionResponse>("$DETECTOR_HOSTNAME/detect", 20) {
         header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
         body = b64Images
     }
@@ -156,14 +158,14 @@ suspend fun HttpClient.elaborateImage(
         }
         .toList()
         .let { request ->
-            post<List<ExtractionResponse>>("$EXTRACTOR_HOSTNAME/extract/array") {
+            post<List<ExtractionResponse>>("$EXTRACTOR_HOSTNAME/extract/array", 20) {
                 header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
                 body = request
             }
         }
         .asFlow()
         .map {
-            val embeddings = post<EmbeddingResponse>("$EMBEDDER_HOSTNAME/embed") {
+            val embeddings = post<EmbeddingResponse>("$EMBEDDER_HOSTNAME/embed", 20) {
                 header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
                 body = it.extracted.map { it.image }
             }
@@ -176,6 +178,32 @@ suspend fun HttpClient.elaborateImage(
         }
         .toList()
 
+
+suspend inline fun <reified T> HttpClient.post(
+    urlString: String,
+    retries: Int,
+    block: HttpRequestBuilder.() -> Unit = {}
+): T {
+    var attempts = 0
+    val errors = mutableListOf<Throwable>()
+    while (true) {
+        val res = try {
+            attempts++
+            post<T> {
+                url.takeFrom(urlString)
+                block()
+            }
+        } catch (e: Throwable) {
+            errors.add(e)
+            null
+        }
+        if (res != null) {
+            return res
+        } else if (attempts >= retries) {
+            throw errors.last()
+        }
+    }
+}
 
 @Serializable
 data class ImageWithExtractedData(
