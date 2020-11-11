@@ -12,10 +12,9 @@ services:
   query-builder:
     image: face-detector-stack/query-builder:1.0-SNAPSHOT
     ports:
-     - 50051:50051
+    - 50051:50051
     environment:
       DETECTOR_HOSTNAME: "detection:50051"
       EXTRACTOR_HOSTNAME: "extraction:50051"
       EMBEDDER_HOSTNAME: "embedding:50051"
-
 
