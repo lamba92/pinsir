@@ -1,4 +1,5 @@
 import kotlin.random.Random
+import kotlin.math.min
 
 tasks {
 
@@ -6,7 +7,7 @@ tasks {
         group = "preprocessing"
         inputs.property("seed", 100)
         inputs.file(file("identity_annotations.txt"))
-        outputs.file(file("$buildDir/preprocessing/output.txt"))
+        outputs.file(file("$buildDir/preprocessing/output2.txt"))
         doLast {
             val seed = Random(inputs.properties["seed"] as Int)
             mutableMapOf<String, MutableList<String>>()
@@ -20,7 +21,7 @@ tasks {
                     }
                 }.entries.asSequence()
                 .filter { it.value.size >= 10 }
-                .map { it.key.toInt() to it.value.subList(0, 10).toList() }
+                .map { it.key.toInt() to it.value.subList(10, min(it.value.size, 20)).toList() }
                 .toMap()
                 .let { identitiesMap ->
                     @OptIn(ExperimentalStdlibApi::class)
@@ -42,7 +43,7 @@ tasks {
                     }
                 }
                 .let { newData ->
-                    file("$buildDir/preprocessing/output.txt").bufferedWriter().use { writer ->
+                    file("$buildDir/preprocessing/output2.txt").bufferedWriter().use { writer ->
                         newData.forEach { (file1, file2, clazz) ->
                             writer.write("$file1 $file2 ${if (clazz) "1" else "0"}")
                             writer.newLine()
@@ -58,7 +59,7 @@ tasks {
         doLast {
             var zeros = 0
             var ones = 0
-            file("$buildDir/preprocessing/output.txt").useLines {
+            file("$buildDir/preprocessing/output2.txt").useLines {
                 it.map { it.split(" ").last() }
                     .forEach {
                         when (it) {
