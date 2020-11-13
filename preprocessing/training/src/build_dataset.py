@@ -41,10 +41,8 @@ def row_to_data(row, client):
         )
 
 
-def elaborate(step, step_size_, parts, df):
+def elaborate(step, step_size_, parts, df, gateway_client):
     if not os.path.isfile(f"./dataset/step_{step + 1}_of_{parts}_part2.pkl"):
-        channel = grpc.insecure_channel('localhost:50051')
-        gateway_client = GatewayStub(channel)
         print(f"Starting step #{step + 1} of {parts}")
         start_index = step_size_ * step
         end_index = start_index + step_size_
@@ -80,10 +78,11 @@ if __name__ == '__main__':
     training_dataset = training_dataset[training_dataset["class"] == 0].head(25000) \
         .append(training_dataset[training_dataset["class"] == 1].head(25000)) \
         .reset_index()
-
+    channel = grpc.insecure_channel('localhost:50051')
+    gateway_client = GatewayStub(channel)
     items_count = len(training_dataset.index)
     parts = 100
     step_size = int(items_count / parts)
 
-    for step in range(0, parts):
-        elaborate(step, step_size, parts, training_dataset)
+    for step in range(0, parts-50):
+        elaborate(step, step_size, parts, training_dataset, gateway_client)
