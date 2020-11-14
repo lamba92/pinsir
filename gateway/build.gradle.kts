@@ -45,7 +45,7 @@ kotlin {
 }
 
 docker {
-    name = "${rootProject.name}/${project.name}:${project.version}"
+    name = "lamba92/${project.rootProject.name}.${project.name}:${project.version}"
     files(tasks.installDist.get().outputs)
     buildArgs(mapOf("APP_NAME" to project.name))
 }
@@ -58,11 +58,16 @@ tasks {
         dependsOn(installDist)
     }
     register<DockerBuildx>("dockerBuildx") {
-        dependsOn(dockerPrepare)
         group = "docker"
-        context = file("$buildDir/docker")
-        imageName = "lamba92/${rootProject.name}.${project.name}"
-        buildArguments.set(mapOf("APP_NAME" to project.name))
+        dependsOn(dockerPrepare)
+        context = dockerPrepare.get().destinationDir
+    }
+    register<DockerBuildx>("dockerBuildxPublish") {
+        group = "docker"
+        dependsOn(dockerPrepare)
+        context = dockerPrepare.get().destinationDir
         publish = true
+        imageName = "lamba92/$imageName"
+        buildArguments.set(mapOf("APP_NAME" to project.name))
     }
 }

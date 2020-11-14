@@ -23,6 +23,7 @@ open class DockerBuildx : DefaultTask() {
 
     @get:Input
     var imageName by project.objects.property<String>()
+        .apply { set("${project.rootProject.name}.${project.name}") }
 
     @get:Input
     var publish by project.objects.property<Boolean>()
@@ -34,6 +35,10 @@ open class DockerBuildx : DefaultTask() {
 
     @get:InputDirectory
     var context by project.objects.property<File>()
+
+    init {
+        group = "docker"
+    }
 
     @OptIn(ExperimentalStdlibApi::class)
     @TaskAction
@@ -55,4 +60,20 @@ open class DockerBuildx : DefaultTask() {
             }
         }
     }
+}
+
+open class DockerBuildxSetup : DefaultTask() {
+
+    init {
+        group = "docker"
+    }
+
+    @TaskAction
+    fun setup(): Unit = with(project) {
+        exec {
+            executable = "docker"
+            args = listOf("buildx create --use")
+        }
+    }
+
 }

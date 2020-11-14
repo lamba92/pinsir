@@ -1,18 +1,26 @@
 version: "3.8"
 services:
   detection:
-    image: face-detector-stack/detection:1.0-SNAPSHOT
+    image: lamba92/face-detector-stack.detection:1.0-SNAPSHOT
+    deploy:
+      mode: global
 
   extraction:
-    image: face-detector-stack/extraction:1.0-SNAPSHOT
+    image: lamba92/face-detector-stack.extraction:1.0-SNAPSHOT
+    deploy:
+      mode: global
 
   embedding:
-    image: face-detector-stack/embedding:1.0-SNAPSHOT
+    image: lamba92/face-detector-stack.embedding:1.0-SNAPSHOT
+    deploy:
+      mode: global
 
-  query-builder:
-    image: face-detector-stack/query-builder:1.0-SNAPSHOT
+  gateway:
+    image: lamba92/face-detector-stack.gateway:1.0-SNAPSHOT
     ports:
     - 50051:50051
+    deploy:
+        mode: global
     environment:
       DETECTOR_HOSTNAME: "detection:50051"
       EXTRACTOR_HOSTNAME: "extraction:50051"

@@ -84,5 +84,5 @@ if __name__ == '__main__':
     parts = 100
     step_size = int(items_count / parts)
 
-    for step in range(0, parts-50):
+    for step in range(50, parts):
         elaborate(step, step_size, parts, training_dataset, gateway_client)

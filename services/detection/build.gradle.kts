@@ -3,16 +3,21 @@ plugins {
 }
 
 docker {
-    name = "${rootProject.name}/${project.name}:${project.version}"
+    name = "lamba92/${project.rootProject.name}.${project.name}:${project.version}"
     files("src")
 }
 
 tasks {
     register<DockerBuildx>("dockerBuildx") {
-        dependsOn(dockerPrepare)
         group = "docker"
-        context = file("$buildDir/docker")
-        imageName = "lamba92/${rootProject.name}.${project.name}"
+        dependsOn(dockerPrepare)
+        context = dockerPrepare.get().destinationDir
+    }
+    register<DockerBuildx>("dockerBuildxPublish") {
+        group = "docker"
+        dependsOn(dockerPrepare)
+        imageName = "lamba92/$imageName"
+        context = dockerPrepare.get().destinationDir
         publish = true
     }
     val generatePythonDefinitions by project(":data").tasks.getting(PythonProtoc::class)

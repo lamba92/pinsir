@@ -6,7 +6,7 @@ val services = arrayOf(
     ":embedding"
 )
 
-include(*services, ":data", ":query-builder", ":preprocessing:dataset-builder", ":preprocessing:training", ":preprocessing")
+include(*services, ":data", ":gateway", ":preprocessing:dataset-builder", ":preprocessing:training", ":preprocessing")
 
 services.forEach {
     project(it).projectDir = file("./services/${it.removePrefix(":")}")

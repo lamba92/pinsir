@@ -4,6 +4,9 @@ package com.github.lamba92.fds
 
 import java.lang.IllegalArgumentException
 
+fun GatewayRequest(elements: List<String>) =
+    GatewayOuterClass.GatewayRequest.newBuilder().addAllImages(elements).build()!!
+
 fun GatewayResponse(elements: List<GatewayOuterClass.GatewayResponse.ImageWithExtractedData>) =
     GatewayOuterClass.GatewayResponse.newBuilder().addAllElements(elements).build()!!
 
@@ -24,3 +27,15 @@ fun DetectionRequest(images: List<String>) =
 
 fun envOrThrow(name: String) =
     System.getenv(name) ?: throw IllegalArgumentException("$name not found in environment")
+
+suspend fun EmbeddingGrpcKt.EmbeddingCoroutineStub.embed(images: List<String>) =
+    embed(EmbeddingRequest(images))
+
+suspend fun ExtractionGrpcKt.ExtractionCoroutineStub.extract(originalImage: String, annotations: List<Common.FaceAnnotation>) =
+    extract(ExtractionRequest(originalImage, annotations))
+
+suspend fun DetectionGrpcKt.DetectionCoroutineStub.detect(images: List<String>) =
+    detect(DetectionRequest(images))
+
+suspend fun GatewayGrpcKt.GatewayCoroutineStub.elaborate(images: List<String>) =
+    elaborate(GatewayRequest(images))
