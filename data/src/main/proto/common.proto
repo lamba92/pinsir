@@ -27,3 +27,16 @@ message Point {
   int32 x = 1;
   int32 y = 2;
 }
+
+message EmbeddingContainer {
+  repeated double array = 1;
+}
+
+message ComparisonResult {
+  bool isSame = 1;
+  double confidence = 2;
+}
+
+message ComparisonResponse {
+  repeated ComparisonResult results = 1;
+}

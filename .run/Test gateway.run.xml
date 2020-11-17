@@ -1,0 +1,30 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Test gateway" type="GradleRunConfiguration" factoryName="Gradle">
+    <ExternalSystemSettings>
+      <option name="env">
+        <map>
+          <entry key="COMPARATOR_HOSTNAME" value="localhost:50053" />
+          <entry key="DETECTOR_HOSTNAME" value="localhost:50050" />
+          <entry key="EMBEDDER_HOSTNAME" value="localhost:50052" />
+          <entry key="EXTRACTOR_HOSTNAME" value="localhost:50051" />
+          <entry key="GATEWAY_HOSTNAME" value="localhost:50054" />
+        </map>
+      </option>
+      <option name="executionName" />
+      <option name="externalProjectPath" value="$PROJECT_DIR$" />
+      <option name="externalSystemIdString" value="GRADLE" />
+      <option name="scriptParameters" value="--tests &quot;TestFlow&quot;" />
+      <option name="taskDescriptions">
+        <list />
+      </option>
+      <option name="taskNames">
+        <list>
+          <option value=":gateway:test" />
+        </list>
+      </option>
+      <option name="vmOptions" value="" />
+    </ExternalSystemSettings>
+    <GradleScriptDebugEnabled>false</GradleScriptDebugEnabled>
+    <method v="2" />
+  </configuration>
+</component>

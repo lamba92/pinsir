@@ -2,14 +2,25 @@ syntax = "proto3";
 import "common.proto";
 
 service Gateway {
-  rpc elaborate(GatewayRequest) returns (GatewayResponse) {}
+  rpc elaborate(ElaborationRequest) returns (ElaborationResponse);
+  rpc comparePortraits(ComparePortraitsRequest) returns (ComparisonResult);
 }
 
-message GatewayRequest {
+message ComparePortraitsRequest {
+  string portrait = 1;
+  string other_portrait = 2;
+}
+
+message ComparePortraitsResponse {
+  string portrait = 1;
+  string other_portrait = 2;
+}
+
+message ElaborationRequest {
   repeated string images = 1;
 }
 
-message GatewayResponse {
+message ElaborationResponse {
   repeated ImageWithExtractedData elements = 1;
   message ImageWithExtractedData {
 

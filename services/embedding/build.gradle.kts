@@ -4,7 +4,7 @@ plugins {
 
 docker {
     name = "lamba92/${project.rootProject.name}.${project.name}:${project.version}"
-    files("src")
+    files(".")
 }
 
 tasks {
@@ -13,7 +13,7 @@ tasks {
         group = "grpc"
         dependsOn(generatePythonDefinitions)
         from(generatePythonDefinitions.destinationDir)
-        into("src")
+        into(".")
     }
     register<DockerBuildx>("dockerBuildx") {
         group = "docker"

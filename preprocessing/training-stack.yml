@@ -1,28 +1,65 @@
 version: "3.8"
 services:
-  detection:
+  detection-1:
     image: lamba92/face-detector-stack.detection:1.0-SNAPSHOT
-    deploy:
-      mode: global
+  detection-2:
+    image: lamba92/face-detector-stack.detection:1.0-SNAPSHOT
+  detection-3:
+    image: lamba92/face-detector-stack.detection:1.0-SNAPSHOT
+  detection-4:
+    image: lamba92/face-detector-stack.detection:1.0-SNAPSHOT
 
-  extraction:
+  extraction-1:
     image: lamba92/face-detector-stack.extraction:1.0-SNAPSHOT
-    deploy:
-      mode: global
+  extraction-2:
+    image: lamba92/face-detector-stack.extraction:1.0-SNAPSHOT
+  extraction-3:
+    image: lamba92/face-detector-stack.extraction:1.0-SNAPSHOT
+  extraction-4:
+    image: lamba92/face-detector-stack.extraction:1.0-SNAPSHOT
 
-  embedding:
+  embedding-1:
     image: lamba92/face-detector-stack.embedding:1.0-SNAPSHOT
-    deploy:
-      mode: global
+  embedding-2:
+    image: lamba92/face-detector-stack.embedding:1.0-SNAPSHOT
+  embedding-3:
+    image: lamba92/face-detector-stack.embedding:1.0-SNAPSHOT
+  embedding-4:
+    image: lamba92/face-detector-stack.embedding:1.0-SNAPSHOT
 
-  gateway:
+  gateway-1:
     image: lamba92/face-detector-stack.gateway:1.0-SNAPSHOT
     ports:
     - 50051:50051
-    deploy:
-        mode: global
     environment:
-      DETECTOR_HOSTNAME: "detection:50051"
-      EXTRACTOR_HOSTNAME: "extraction:50051"
-      EMBEDDER_HOSTNAME: "embedding:50051"
+      DETECTOR_HOSTNAME: "detection-1:50051"
+      EXTRACTOR_HOSTNAME: "extraction-1:50051"
+      EMBEDDER_HOSTNAME: "embedding-1:50051"
+
+  gateway-2:
+    image: lamba92/face-detector-stack.gateway:1.0-SNAPSHOT
+    ports:
+      - 50052:50051
+    environment:
+      DETECTOR_HOSTNAME: "detection-2:50051"
+      EXTRACTOR_HOSTNAME: "extraction-2:50051"
+      EMBEDDER_HOSTNAME: "embedding-2:50051"
+
+  gateway-3:
+    image: lamba92/face-detector-stack.gateway:1.0-SNAPSHOT
+    ports:
+      - 50053:50051
+    environment:
+      DETECTOR_HOSTNAME: "detection-3:50051"
+      EXTRACTOR_HOSTNAME: "extraction-3:50051"
+      EMBEDDER_HOSTNAME: "embedding-3:50051"
+
+  gateway-4:
+    image: lamba92/face-detector-stack.gateway:1.0-SNAPSHOT
+    ports:
+      - 50054:50051
+    environment:
+      DETECTOR_HOSTNAME: "detection-4:50051"
+      EXTRACTOR_HOSTNAME: "extraction-4:50051"
+      EMBEDDER_HOSTNAME: "embedding-4:50051"
 

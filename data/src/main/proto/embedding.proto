@@ -1,7 +1,8 @@
 syntax = "proto3";
+import "common.proto";
 
 service Embedding {
-  rpc embed(EmbeddingRequest) returns (EmbeddingResponse) {}
+  rpc embed(EmbeddingRequest) returns (EmbeddingResponse);
 }
 
 message EmbeddingRequest {
@@ -10,10 +11,6 @@ message EmbeddingRequest {
 
 message EmbeddingResponse {
 
-  repeated Embedding results = 1;
-
-  message Embedding {
-    repeated double array = 1;
-  }
+  repeated EmbeddingContainer results = 1;
 
 }

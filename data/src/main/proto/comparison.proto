@@ -1,0 +1,11 @@
+syntax = "proto3";
+import "common.proto";
+
+service Comparison {
+  rpc compare(ComparisonRequest) returns (ComparisonResponse);
+}
+
+message ComparisonRequest {
+  repeated EmbeddingContainer embeddings = 1;
+  repeated EmbeddingContainer other_embeddings = 2;
+}

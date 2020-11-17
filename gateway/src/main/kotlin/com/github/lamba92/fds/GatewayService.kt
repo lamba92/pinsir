@@ -1,14 +1,16 @@
 package com.github.lamba92.fds
 
+import Common.*
+import ComparisonGrpcKt.ComparisonCoroutineStub
 import DetectionGrpcKt.DetectionCoroutineStub
 import EmbeddingGrpcKt.EmbeddingCoroutineStub
 import EmbeddingOuterClass.EmbeddingResponse
-import EmbeddingOuterClass.EmbeddingResponse.Embedding
 import ExtractionGrpcKt.ExtractionCoroutineStub
 import ExtractionOuterClass.ExtractionResponse
 import ExtractionOuterClass.ExtractionResponse.AnnotatedPortrait
 import GatewayGrpcKt
-import GatewayOuterClass.GatewayResponse.ImageWithExtractedData.PortraitWithEmbedding
+import GatewayOuterClass.*
+import GatewayOuterClass.ElaborationResponse.ImageWithExtractedData.PortraitWithEmbedding
 import io.grpc.ManagedChannelBuilder
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.map
@@ -34,7 +36,10 @@ class GatewayService : GatewayGrpcKt.GatewayCoroutineImplBase() {
     private val embeddingApp =
         EmbeddingCoroutineStub(channelFromEnv("EMBEDDER_HOSTNAME"))
 
-    override suspend fun elaborate(request: GatewayOuterClass.GatewayRequest) =
+    private val comparisonApp =
+        ComparisonCoroutineStub(channelFromEnv("COMPARATOR_HOSTNAME"))
+
+    override suspend fun elaborate(request: ElaborationRequest): ElaborationResponse =
         detectionApp.detect(request.imagesList)
             .itemsList
             .asFlow()
@@ -42,7 +47,7 @@ class GatewayService : GatewayGrpcKt.GatewayCoroutineImplBase() {
             .map { it to embeddingApp.embed(it.extractedList.map { it.image }) }
             .map { (extractionResponse: ExtractionResponse, embeddingResponse: EmbeddingResponse) ->
                 extractionResponse.originalImage to extractionResponse.extractedList
-                    .zip(embeddingResponse.resultsList) { ext: AnnotatedPortrait, emb: Embedding ->
+                    .zip(embeddingResponse.resultsList) { ext: AnnotatedPortrait, emb: EmbeddingContainer ->
                         PortraitWithEmbedding(emb.arrayList, ext.image, ext.annotation)
                     }
             }
@@ -50,7 +55,18 @@ class GatewayService : GatewayGrpcKt.GatewayCoroutineImplBase() {
                 ImageWithExtractedData(originalImage, data)
             }
             .toList()
-            .let { GatewayResponse(it) }
+            .let { ElaborationResponse(it) }
+
+    override suspend fun comparePortraits(request: ComparePortraitsRequest): ComparisonResult =
+        listOf(request.portrait, request.otherPortrait)
+            .let { detectionApp.detect(it).itemsList }
+            .asFlow()
+            .map { extractionApp.extract(it.image, it.annotationsList) }
+            .map { it.extractedList[0].image }
+            .toList()
+            .let { embeddingApp.embed(it).resultsList }
+            .let { (e1, e2) -> ComparisonRequest(listOf(e1), listOf(e2)) }
+            .let { comparisonApp.compare(it).resultsList.first()!! }
 
 }
 

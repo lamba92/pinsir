@@ -1,9 +1,10 @@
-rootProject.name = "face-detector-stack"
+rootProject.name = "pinsir"
 
 val services = arrayOf(
     ":detection",
     ":extraction",
-    ":embedding"
+    ":embedding",
+    ":comparison"
 )
 
 include(*services, ":data", ":gateway", ":preprocessing:dataset-builder", ":preprocessing:training", ":preprocessing")

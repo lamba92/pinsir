@@ -1,20 +1,25 @@
-@file:Suppress("FunctionName")
+@file:Suppress("FunctionName", "RemoveRedundantQualifierName")
 
 package com.github.lamba92.fds
 
+import Common.ComparisonResponse.*
+import Common.ComparisonResult
+import Common.EmbeddingContainer
+import ComparisonOuterClass.ComparisonRequest
+import GatewayOuterClass.ComparePortraitsRequest
 import java.lang.IllegalArgumentException
 
-fun GatewayRequest(elements: List<String>) =
-    GatewayOuterClass.GatewayRequest.newBuilder().addAllImages(elements).build()!!
+fun ElaborationRequest(elements: List<String>) =
+    GatewayOuterClass.ElaborationRequest.newBuilder().addAllImages(elements).build()!!
 
-fun GatewayResponse(elements: List<GatewayOuterClass.GatewayResponse.ImageWithExtractedData>) =
-    GatewayOuterClass.GatewayResponse.newBuilder().addAllElements(elements).build()!!
+fun ElaborationResponse(elements: List<GatewayOuterClass.ElaborationResponse.ImageWithExtractedData>) =
+    GatewayOuterClass.ElaborationResponse.newBuilder().addAllElements(elements).build()!!
 
-fun ImageWithExtractedData(originalImage: String, data: List<GatewayOuterClass.GatewayResponse.ImageWithExtractedData.PortraitWithEmbedding>) =
-    GatewayOuterClass.GatewayResponse.ImageWithExtractedData.newBuilder().setOriginalImage(originalImage).addAllData(data).build()!!
+fun ImageWithExtractedData(originalImage: String, data: List<GatewayOuterClass.ElaborationResponse.ImageWithExtractedData.PortraitWithEmbedding>) =
+    GatewayOuterClass.ElaborationResponse.ImageWithExtractedData.newBuilder().setOriginalImage(originalImage).addAllData(data).build()!!
 
 fun PortraitWithEmbedding(embedding: List<Double>, face: String, annotation: Common.FaceAnnotation) =
-    GatewayOuterClass.GatewayResponse.ImageWithExtractedData.PortraitWithEmbedding.newBuilder().addAllArray(embedding).setFaceImage(face).setAnnotation(annotation).build()!!
+    GatewayOuterClass.ElaborationResponse.ImageWithExtractedData.PortraitWithEmbedding.newBuilder().addAllArray(embedding).setFaceImage(face).setAnnotation(annotation).build()!!
 
 fun EmbeddingRequest(images: List<String>) =
     EmbeddingOuterClass.EmbeddingRequest.newBuilder().addAllImages(images).build()!!
@@ -24,6 +29,18 @@ fun ExtractionRequest(image: String, annotations: List<Common.FaceAnnotation>) =
 
 fun DetectionRequest(images: List<String>) =
     DetectionOuterClass.DetectionRequest.newBuilder().addAllImages(images).build()!!
+
+fun EmbeddingContainer(array: List<Double>): EmbeddingContainer =
+    EmbeddingContainer.newBuilder().addAllArray(array).build()!!
+
+fun ComparisonRequest(embeddings: List<EmbeddingContainer>, otherEmbeddings: List<EmbeddingContainer>) =
+    ComparisonRequest.newBuilder().addAllEmbeddings(embeddings).addAllOtherEmbeddings(otherEmbeddings).build()!!
+
+fun ComparisonResponse(results: List<ComparisonResult>) =
+    newBuilder().addAllResults(results).build()!!
+
+fun ComparePortraitsRequest(portrait: String, otherPortrait: String) =
+    ComparePortraitsRequest.newBuilder().setPortrait(portrait).setOtherPortrait(otherPortrait).build()!!
 
 fun envOrThrow(name: String) =
     System.getenv(name) ?: throw IllegalArgumentException("$name not found in environment")
@@ -38,4 +55,7 @@ suspend fun DetectionGrpcKt.DetectionCoroutineStub.detect(images: List<String>) 
     detect(DetectionRequest(images))
 
 suspend fun GatewayGrpcKt.GatewayCoroutineStub.elaborate(images: List<String>) =
-    elaborate(GatewayRequest(images))
+    elaborate(ElaborationRequest(images))
+
+suspend fun GatewayGrpcKt.GatewayCoroutineStub.comparePortraits(portrait: String, otherPortrait: String) =
+    comparePortraits(ComparePortraitsRequest(portrait, otherPortrait))

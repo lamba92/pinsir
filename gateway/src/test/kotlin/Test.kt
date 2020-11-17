@@ -1,19 +1,18 @@
 @file:Suppress("TestFunctionName")
 
+import ComparisonGrpcKt.ComparisonCoroutineStub
 import DetectionGrpcKt.DetectionCoroutineStub
 import EmbeddingGrpcKt.EmbeddingCoroutineStub
 import ExtractionGrpcKt.ExtractionCoroutineStub
 import GatewayGrpcKt.GatewayCoroutineStub
-import GatewayOuterClass.GatewayRequest
-import com.github.lamba92.fds.detect
-import com.github.lamba92.fds.embed
-import com.github.lamba92.fds.envOrThrow
-import com.github.lamba92.fds.extract
+import com.github.lamba92.fds.*
 import io.grpc.ManagedChannelBuilder
 import kotlinx.coroutines.runBlocking
 import java.util.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class TestFlow {
 
@@ -34,9 +33,8 @@ class TestFlow {
     private val embeddingApp =
         EmbeddingCoroutineStub(channelFromEnv("EMBEDDER_HOSTNAME"))
 
-    private fun getImage() = (Thread.currentThread().contextClassLoader
-        .getResourceAsStream("test2.jpg") ?: throw IllegalArgumentException("test2.jpg not found in resources"))
-        .let { Base64.getEncoder().encodeToString(it.readBytes()) }!!
+    private val comparisonApp =
+        ComparisonCoroutineStub(channelFromEnv("COMPARATOR_HOSTNAME"))
 
     private fun getTestImage(number: Int) = (Thread.currentThread().contextClassLoader
         .getResourceAsStream(number.toString().padStart(6, '0') + ".jpg")
@@ -86,9 +84,20 @@ class TestFlow {
         assertEquals(embedding2, gatewayEmbedding2)
     }
 
-    private fun GatewayRequest(images: List<String>) =
-        GatewayRequest.newBuilder().addAllImages(images).build()!!
+    @Test
+    fun `test same person image`() = runBlocking {
+        val image = getTestImage(8)
+        val result = gatewayApp.comparePortraits(image, image)
+        println("Confidence: ${result.confidence}")
+        assertTrue(result.isSame)
+    }
 
-    private suspend fun GatewayCoroutineStub.elaborate(images: List<String>) =
-        elaborate(GatewayRequest(images))
+    @Test
+    fun `test different person images`() = runBlocking {
+        val image = getTestImage(1)
+        val image2 = getTestImage(10)
+        val result = gatewayApp.comparePortraits(image, image2)
+        println("Confidence: ${result.confidence}")
+        assertFalse(result.isSame)
+    }
 }
