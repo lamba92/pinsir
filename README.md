@@ -18,7 +18,7 @@ Identity recognition requires different steps that need to be framed independent
 
 <img src="https://raw.githubusercontent.com/lamba92/pinsir/dev/.github/images/pinsir-services-docker.svg" width="100%">
 
-All containers communicate through gRPC generated from proto files available [here](/data/src/main/proto). While Kotlin/JVM and Java artifacts are available on my Maven repository (instructions below), the Python declarations are not wrapped as a library. To build them copy the proto files and run `protoc` on your own or clone the project and [run](/data/build.gradle.kts#L65) `./gradlew :data:generatePythonDefinitions` which will be available in `data/build/grpc/python`.
+All containers communicate through gRPC generated from proto files available [here](/data/src/main/proto). While Kotlin/JVM and Java artifacts are available on my Maven repository (instructions below), the Python declarations are not wrapped as a library. To build them copy the proto files and run `protoc` on your own or clone the project and [run](/data/build.gradle.kts#L88) `./gradlew :data:generatePythonDefinitions` which will be available in `data/build/grpc/python`.
 
 # Docker images
 
