@@ -1,4 +1,4 @@
-<img src="https://raw.githubusercontent.com/lamba92/pinsir/dev/.github/images/pinsir-logo.svg" width="100%">
+<img src="https://raw.githubusercontent.com/lamba92/pinsir/master/.github/images/pinsir-logo.svg" width="100%">
 
 PINSIR, or Person Identification Network Stack for Identity Recognition, is a scalable open source end to end solution for face detection and identity recognition.
 
@@ -6,7 +6,7 @@ It is divided into 4 main services Detection, Extraction, Embedding and Comparis
 
 # How does it work
 
-<img src="https://raw.githubusercontent.com/lamba92/pinsir/dev/.github/images/pinsir-simple-pipeline.svg" width="100%">
+<img src="https://raw.githubusercontent.com/lamba92/pinsir/master/.github/images/pinsir-simple-pipeline.svg" width="100%">
 
 Identity recognition requires different steps that need to be framed independently of one another:
 
