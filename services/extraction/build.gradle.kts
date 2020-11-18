@@ -1,5 +1,4 @@
 import com.github.lamba92.gradle.utils.*
-import com.google.protobuf.gradle.*
 
 plugins {
     id("com.palantir.docker")
@@ -10,7 +9,7 @@ plugins {
 }
 
 var mainClassName: String by application.mainClass
-mainClassName = "MainKt"
+mainClassName = "com.github.lamba92.pinsir.MainKt"
 
 kotlin {
     target {
@@ -65,13 +64,26 @@ tasks {
         dependsOn(dockerPrepare, dockerBuildxSetup)
         context = dockerPrepare.get().destinationDir
     }
-    register<DockerBuildx>("dockerBuildxPublish") {
+    val dockerBuildxPublish by registering(DockerBuildx::class) {
         group = "docker"
         dependsOn(dockerPrepare, dockerBuildxSetup)
         imageName = "lamba92/$imageName"
         context = dockerPrepare.get().destinationDir
         publish = true
         buildArguments.set(mapOf("APP_NAME" to project.name))
+    }
+    val dockerBuildxPublishLatest by registering(DockerBuildx::class) {
+        group = "docker"
+        dependsOn(dockerPrepare, dockerBuildxSetup)
+        imageName = "lamba92/$imageName"
+        context = dockerPrepare.get().destinationDir
+        publish = true
+        buildArguments.set(mapOf("APP_NAME" to project.name))
+        imageVersion = "latest"
+    }
+    register("publish") {
+        group = "publishing"
+        dependsOn(dockerBuildxPublish, dockerBuildxPublishLatest)
     }
 }
 

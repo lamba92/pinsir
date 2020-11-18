@@ -1,70 +1,70 @@
 version: "3.8"
 services:
   detection-1:
-    image: lamba92/face-detector-stack.detection:1.0-SNAPSHOT
+    image: lamba92/pinsir.detection:1.0-SNAPSHOT
     environment:
       - CUDA_VISIBLE_DEVICES=-1
   detection-2:
-    image: lamba92/face-detector-stack.detection:1.0-SNAPSHOT
+    image: lamba92/pinsir.detection:1.0-SNAPSHOT
     environment:
       - CUDA_VISIBLE_DEVICES=-1
   detection-3:
-    image: lamba92/face-detector-stack.detection:1.0-SNAPSHOT
+    image: lamba92/pinsir.detection:1.0-SNAPSHOT
     environment:
       - CUDA_VISIBLE_DEVICES=-1
   detection-4:
-    image: lamba92/face-detector-stack.detection:1.0-SNAPSHOT
+    image: lamba92/pinsir.detection:1.0-SNAPSHOT
     environment:
       - CUDA_VISIBLE_DEVICES=-1
   detection-5:
-    image: lamba92/face-detector-stack.detection:1.0-SNAPSHOT
+    image: lamba92/pinsir.detection:1.0-SNAPSHOT
     environment:
       - CUDA_VISIBLE_DEVICES=-1
   detection-6:
-    image: lamba92/face-detector-stack.detection:1.0-SNAPSHOT
+    image: lamba92/pinsir.detection:1.0-SNAPSHOT
     environment:
       - CUDA_VISIBLE_DEVICES=-1
 
   extraction-1:
-    image: lamba92/face-detector-stack.extraction:1.0-SNAPSHOT
+    image: lamba92/pinsir.extraction:1.0-SNAPSHOT
   extraction-2:
-    image: lamba92/face-detector-stack.extraction:1.0-SNAPSHOT
+    image: lamba92/pinsir.extraction:1.0-SNAPSHOT
   extraction-3:
-    image: lamba92/face-detector-stack.extraction:1.0-SNAPSHOT
+    image: lamba92/pinsir.extraction:1.0-SNAPSHOT
   extraction-4:
-    image: lamba92/face-detector-stack.extraction:1.0-SNAPSHOT
+    image: lamba92/pinsir.extraction:1.0-SNAPSHOT
   extraction-5:
-    image: lamba92/face-detector-stack.extraction:1.0-SNAPSHOT
+    image: lamba92/pinsir.extraction:1.0-SNAPSHOT
   extraction-6:
-    image: lamba92/face-detector-stack.extraction:1.0-SNAPSHOT
+    image: lamba92/pinsir.extraction:1.0-SNAPSHOT
 
   embedding-1:
-    image: lamba92/face-detector-stack.embedding:1.0-SNAPSHOT
+    image: lamba92/pinsir.embedding:1.0-SNAPSHOT
     environment:
       - CUDA_VISIBLE_DEVICES=-1
   embedding-2:
-    image: lamba92/face-detector-stack.embedding:1.0-SNAPSHOT
+    image: lamba92/pinsir.embedding:1.0-SNAPSHOT
     environment:
       - CUDA_VISIBLE_DEVICES=-1
   embedding-3:
-    image: lamba92/face-detector-stack.embedding:1.0-SNAPSHOT
+    image: lamba92/pinsir.embedding:1.0-SNAPSHOT
     environment:
       - CUDA_VISIBLE_DEVICES=-1
   embedding-4:
-    image: lamba92/face-detector-stack.embedding:1.0-SNAPSHOT
+    image: lamba92/pinsir.embedding:1.0-SNAPSHOT
     environment:
       - CUDA_VISIBLE_DEVICES=-1
   embedding-5:
-    image: lamba92/face-detector-stack.embedding:1.0-SNAPSHOT
+    image: lamba92/pinsir.embedding:1.0-SNAPSHOT
     environment:
       - CUDA_VISIBLE_DEVICES=-1
   embedding-6:
-    image: lamba92/face-detector-stack.embedding:1.0-SNAPSHOT
+    image: lamba92/pinsir.embedding:1.0-SNAPSHOT
     environment:
       - CUDA_VISIBLE_DEVICES=-1
 
   gateway-1:
-    image: lamba92/face-detector-stack.gateway:1.0-SNAPSHOT
+    image: lamba92/pinsir.gateway:1.0-SNAPSHOT
     ports:
     - 50051:50051
     environment:
@@ -73,7 +73,7 @@ services:
       EMBEDDER_HOSTNAME: "embedding-1:50051"
 
   gateway-2:
-    image: lamba92/face-detector-stack.gateway:1.0-SNAPSHOT
+    image: lamba92/pinsir.gateway:1.0-SNAPSHOT
     ports:
       - 50052:50051
     environment:
@@ -82,7 +82,7 @@ services:
       EMBEDDER_HOSTNAME: "embedding-2:50051"
 
   gateway-3:
-    image: lamba92/face-detector-stack.gateway:1.0-SNAPSHOT
+    image: lamba92/pinsir.gateway:1.0-SNAPSHOT
     ports:
       - 50053:50051
     environment:
@@ -91,7 +91,7 @@ services:
       EMBEDDER_HOSTNAME: "embedding-3:50051"
 
   gateway-4:
-    image: lamba92/face-detector-stack.gateway:1.0-SNAPSHOT
+    image: lamba92/pinsir.gateway:1.0-SNAPSHOT
     ports:
       - 50054:50051
     environment:
@@ -100,7 +100,7 @@ services:
       EMBEDDER_HOSTNAME: "embedding-4:50051"
 
   gateway-5:
-    image: lamba92/face-detector-stack.gateway:1.0-SNAPSHOT
+    image: lamba92/pinsir.gateway:1.0-SNAPSHOT
     ports:
       - 50055:50051
     environment:
@@ -109,7 +109,7 @@ services:
       EMBEDDER_HOSTNAME: "embedding-5:50051"
 
   gateway-6:
-    image: lamba92/face-detector-stack.gateway:1.0-SNAPSHOT
+    image: lamba92/pinsir.gateway:1.0-SNAPSHOT
     ports:
       - 50056:50051
     environment:

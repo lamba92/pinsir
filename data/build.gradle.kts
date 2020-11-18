@@ -1,10 +1,15 @@
+import com.android.build.gradle.internal.tasks.factory.dependsOn
 import com.github.lamba92.gradle.utils.kotlinx
+import com.github.lamba92.gradle.utils.prepareForPublication
 import com.google.protobuf.gradle.*
+import com.jfrog.bintray.gradle.tasks.BintrayUploadTask
+import org.gradle.jvm.tasks.Jar
 
 plugins {
     kotlin("jvm")
     `maven-publish`
     id("com.google.protobuf")
+    id("com.jfrog.bintray")
 }
 
 kotlin {
@@ -18,7 +23,13 @@ kotlin {
     sourceSets {
         main {
             kotlin.srcDir("$buildDir/generated")
+            tasks.create<Jar>("sourcesJar") {
+                group = "publishing"
+                archiveClassifier.set("sources")
+                from(kotlin.sourceDirectories)
+            }
         }
+
     }
 }
 
@@ -61,6 +72,21 @@ dependencies {
 
 }
 
+publishing {
+    publications {
+        create<MavenPublication>(project.name) {
+            from(components["kotlin"])
+            artifact(tasks.named<Jar>("sourcesJar"))
+            groupId = project.group as String
+            artifactId = "${rootProject.name}-${project.name}"
+            version = project.version as String
+        }
+    }
+}
+
 tasks {
     register<PythonProtoc>("generatePythonDefinitions")
+    publish.dependsOn("bintrayUpload")
 }
+
+prepareForPublication()

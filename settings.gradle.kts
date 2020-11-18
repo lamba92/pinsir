@@ -1,3 +1,9 @@
+@file:Suppress("UnstableApiUsage")
+
+plugins {
+    `gradle-enterprise`
+}
+
 rootProject.name = "pinsir"
 
 val services = arrayOf(
@@ -11,4 +17,10 @@ include(*services, ":data", ":gateway", ":preprocessing:dataset-builder", ":prep
 
 services.forEach {
     project(it).projectDir = file("./services/${it.removePrefix(":")}")
+}
+
+gradleEnterprise.buildScan {
+    termsOfServiceUrl = "https://gradle.com/terms-of-service"
+    termsOfServiceAgree = "yes"
+    publishAlwaysIf(System.getenv("CI")?.toBoolean() == true)
 }

@@ -10,6 +10,8 @@ evaluationDependsOn(":data")
 
 val dockerBuildxSetup by rootProject.tasks.getting(DockerBuildxSetup::class)
 
+evaluationDependsOn(":data")
+
 tasks {
     val generatePythonDefinitions by project(":data").tasks.getting(PythonProtoc::class)
     register<Copy>("getGrpcDefinitions") {
@@ -23,11 +25,23 @@ tasks {
         dependsOn(dockerPrepare, dockerBuildxSetup)
         context = dockerPrepare.get().destinationDir
     }
-    register<DockerBuildx>("dockerBuildxPublish") {
+    val dockerBuildxPublish by registering(DockerBuildx::class) {
         group = "docker"
         dependsOn(dockerPrepare, dockerBuildxSetup)
         imageName = "lamba92/$imageName"
         context = dockerPrepare.get().destinationDir
         publish = true
+    }
+    val dockerBuildxPublishLatest by registering(DockerBuildx::class) {
+        group = "docker"
+        dependsOn(dockerPrepare, dockerBuildxSetup)
+        imageName = "lamba92/$imageName"
+        context = dockerPrepare.get().destinationDir
+        publish = true
+        imageVersion = "latest"
+    }
+    register("publish") {
+        group = "publishing"
+        dependsOn(dockerBuildxPublish, dockerBuildxPublishLatest)
     }
 }

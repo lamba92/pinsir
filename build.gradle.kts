@@ -1,6 +1,6 @@
 allprojects {
     group = "com.github.lamba92"
-    version = "1.0-SNAPSHOT"
+    version = System.getenv("GITHUB_REF")?.split("/")?.last() ?: "1.0-alpha"
 }
 
 subprojects {

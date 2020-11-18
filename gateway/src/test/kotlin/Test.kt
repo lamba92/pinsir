@@ -5,7 +5,8 @@ import DetectionGrpcKt.DetectionCoroutineStub
 import EmbeddingGrpcKt.EmbeddingCoroutineStub
 import ExtractionGrpcKt.ExtractionCoroutineStub
 import GatewayGrpcKt.GatewayCoroutineStub
-import com.github.lamba92.fds.*
+import com.github.lamba92.pinsir.*
+import com.github.lamba92.pinsir.megabytes
 import io.grpc.ManagedChannelBuilder
 import kotlinx.coroutines.runBlocking
 import java.util.*

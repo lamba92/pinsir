@@ -9,7 +9,7 @@ plugins {
 }
 
 var mainClassName: String by application.mainClass
-mainClassName = "com.github.lamba92.fds.MainKt"
+mainClassName = "com.github.lamba92.pinsir.MainKt"
 
 kotlin {
 
@@ -64,12 +64,25 @@ tasks {
         dependsOn(dockerPrepare, dockerBuildxSetup)
         context = dockerPrepare.get().destinationDir
     }
-    register<DockerBuildx>("dockerBuildxPublish") {
+    val dockerBuildxPublish by registering(DockerBuildx::class) {
         group = "docker"
         dependsOn(dockerPrepare, dockerBuildxSetup)
         context = dockerPrepare.get().destinationDir
         publish = true
         imageName = "lamba92/$imageName"
         buildArguments.set(mapOf("APP_NAME" to project.name))
+    }
+    val dockerBuildxPublishLatest by registering(DockerBuildx::class) {
+        group = "docker"
+        dependsOn(dockerPrepare, dockerBuildxSetup)
+        context = dockerPrepare.get().destinationDir
+        publish = true
+        imageName = "lamba92/$imageName"
+        buildArguments.set(mapOf("APP_NAME" to project.name))
+        imageVersion = "latest"
+    }
+    register("publish") {
+        group = "publishing"
+        dependsOn(dockerBuildxPublish, dockerBuildxPublishLatest)
     }
 }

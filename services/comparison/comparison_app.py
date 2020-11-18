@@ -1,4 +1,5 @@
 import numpy as np
+import os
 
 from comparison_pb2_grpc import ComparisonServicer
 from comparison_pb2 import ComparisonRequest
@@ -7,10 +8,21 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.models import Model
 
 
+def select_model_name():
+    model = os.environ.get("MODEL")
+    if model == "SIMPLE":
+        model = "simple_saved.h5"
+    elif model == "COMPLEX":
+        model = "complex_saved.h5"
+    else:
+        model = "simpler_saved.h5"
+    return model
+
+
 # noinspection PyMethodMayBeStatic
 class ComparisonApp(ComparisonServicer):
 
-    model: Model = load_model("pinsir-net.h5", compile=False)
+    model: Model = load_model(select_model_name(), compile=False)
 
     def prediction_to_result(self, prediction) -> ComparisonResult:
         return ComparisonResult(

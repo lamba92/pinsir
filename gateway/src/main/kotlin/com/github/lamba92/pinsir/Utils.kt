@@ -1,6 +1,6 @@
 @file:Suppress("FunctionName", "RemoveRedundantQualifierName")
 
-package com.github.lamba92.fds
+package com.github.lamba92.pinsir
 
 import Common.ComparisonResponse.*
 import Common.ComparisonResult

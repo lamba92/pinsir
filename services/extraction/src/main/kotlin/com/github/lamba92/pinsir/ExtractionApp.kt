@@ -1,5 +1,8 @@
 @file:Suppress("BlockingMethodInNonBlockingContext")
 
+package com.github.lamba92.pinsir
+
+import ExtractionGrpcKt
 import ExtractionOuterClass.ExtractionRequest
 import ExtractionOuterClass.ExtractionResponse
 import ExtractionOuterClass.ExtractionResponse.AnnotatedPortrait

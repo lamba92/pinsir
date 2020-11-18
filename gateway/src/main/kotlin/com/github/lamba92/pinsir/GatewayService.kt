@@ -1,4 +1,4 @@
-package com.github.lamba92.fds
+package com.github.lamba92.pinsir
 
 import Common.*
 import ComparisonGrpcKt.ComparisonCoroutineStub
@@ -15,7 +15,6 @@ import io.grpc.ManagedChannelBuilder
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
-import megabytes
 
 class GatewayService : GatewayGrpcKt.GatewayCoroutineImplBase() {
 
