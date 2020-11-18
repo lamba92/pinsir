@@ -31,7 +31,7 @@ open class DockerBuildx : DefaultTask() {
 
     @get:Input
     var quiet by project.objects.property<Boolean>()
-        .apply { set(getenv("CI")?.toBoolean() == true) }
+        .apply { set(false) }
 
     @get:Input
     var imageVersion by project.objects.property<String>()
