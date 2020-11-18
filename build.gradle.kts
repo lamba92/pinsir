@@ -20,3 +20,7 @@ tasks {
 }
 
 val dockerBuildxSetup by tasks.registering(DockerBuildxSetup::class)
+
+task("publish") {
+    group = "publishing"
+}
