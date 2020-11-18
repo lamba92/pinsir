@@ -86,9 +86,9 @@ Maven:
 </repositories>
 
 <dependency>
-	<groupId>com.github.lamba92</groupId>
-	<artifactId>pinsir-data</artifactId>
-	<version>LATEST-VERSION</version>
-	<type>pom</type>
+    <groupId>com.github.lamba92</groupId>
+    <artifactId>pinsir-data</artifactId>
+    <version>LATEST-VERSION</version>
+    <type>pom</type>
 </dependency>
 ```
