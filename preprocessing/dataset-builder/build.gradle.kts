@@ -7,7 +7,7 @@ tasks {
         group = "preprocessing"
         inputs.property("seed", 100)
         inputs.file(file("identity_annotations.txt"))
-        outputs.file(file("$buildDir/preprocessing/output2.txt"))
+        outputs.file(file("$buildDir/preprocessing/output.txt"))
         doLast {
             val seed = Random(inputs.properties["seed"] as Int)
             mutableMapOf<String, MutableList<String>>()
@@ -25,10 +25,10 @@ tasks {
                 .toMap()
                 .let { identitiesMap ->
                     @OptIn(ExperimentalStdlibApi::class)
-                    buildList {
+                    buildMap<Pair<String, String>, Boolean> {
                         identitiesMap.forEach { (identity, files) ->
                             files.combineWith(files).forEach { (f1, f2) ->
-                                add(Triple(f1, f2, true))
+                                put(f1 to f2, true)
                             }
                             identitiesMap.keys.extractRandom(
                                 excludeElements = listOf(identity),
@@ -37,15 +37,15 @@ tasks {
                                 .map { identitiesMap.getValue(it) }
                                 .flatMap { it.combineWith(files) }
                                 .forEach { (f1, f2) ->
-                                    add(Triple(f1, f2, false))
+                                    put(f1 to f2, false)
                                 }
                         }
                     }
                 }
                 .let { newData ->
-                    file("$buildDir/preprocessing/output2.txt").bufferedWriter().use { writer ->
-                        newData.forEach { (file1, file2, clazz) ->
-                            writer.write("$file1 $file2 ${if (clazz) "1" else "0"}")
+                    file("$buildDir/preprocessing/output.txt").bufferedWriter().use { writer ->
+                        newData.forEach { (files, clazz) ->
+                            writer.write("${files.first} ${files.second} ${if (clazz) "1" else "0"}")
                             writer.newLine()
                         }
                     }
@@ -59,7 +59,7 @@ tasks {
         doLast {
             var zeros = 0
             var ones = 0
-            file("$buildDir/preprocessing/output2.txt").useLines {
+            file("$buildDir/preprocessing/output.txt").useLines {
                 it.map { it.split(" ").last() }
                     .forEach {
                         when (it) {

@@ -2,12 +2,28 @@ version: "3.8"
 services:
   detection-1:
     image: lamba92/face-detector-stack.detection:1.0-SNAPSHOT
+    environment:
+      - CUDA_VISIBLE_DEVICES=-1
   detection-2:
     image: lamba92/face-detector-stack.detection:1.0-SNAPSHOT
+    environment:
+      - CUDA_VISIBLE_DEVICES=-1
   detection-3:
     image: lamba92/face-detector-stack.detection:1.0-SNAPSHOT
+    environment:
+      - CUDA_VISIBLE_DEVICES=-1
   detection-4:
     image: lamba92/face-detector-stack.detection:1.0-SNAPSHOT
+    environment:
+      - CUDA_VISIBLE_DEVICES=-1
+  detection-5:
+    image: lamba92/face-detector-stack.detection:1.0-SNAPSHOT
+    environment:
+      - CUDA_VISIBLE_DEVICES=-1
+  detection-6:
+    image: lamba92/face-detector-stack.detection:1.0-SNAPSHOT
+    environment:
+      - CUDA_VISIBLE_DEVICES=-1
 
   extraction-1:
     image: lamba92/face-detector-stack.extraction:1.0-SNAPSHOT
@@ -17,15 +33,35 @@ services:
     image: lamba92/face-detector-stack.extraction:1.0-SNAPSHOT
   extraction-4:
     image: lamba92/face-detector-stack.extraction:1.0-SNAPSHOT
+  extraction-5:
+    image: lamba92/face-detector-stack.extraction:1.0-SNAPSHOT
+  extraction-6:
+    image: lamba92/face-detector-stack.extraction:1.0-SNAPSHOT
 
   embedding-1:
     image: lamba92/face-detector-stack.embedding:1.0-SNAPSHOT
+    environment:
+      - CUDA_VISIBLE_DEVICES=-1
   embedding-2:
     image: lamba92/face-detector-stack.embedding:1.0-SNAPSHOT
+    environment:
+      - CUDA_VISIBLE_DEVICES=-1
   embedding-3:
     image: lamba92/face-detector-stack.embedding:1.0-SNAPSHOT
+    environment:
+      - CUDA_VISIBLE_DEVICES=-1
   embedding-4:
     image: lamba92/face-detector-stack.embedding:1.0-SNAPSHOT
+    environment:
+      - CUDA_VISIBLE_DEVICES=-1
+  embedding-5:
+    image: lamba92/face-detector-stack.embedding:1.0-SNAPSHOT
+    environment:
+      - CUDA_VISIBLE_DEVICES=-1
+  embedding-6:
+    image: lamba92/face-detector-stack.embedding:1.0-SNAPSHOT
+    environment:
+      - CUDA_VISIBLE_DEVICES=-1
 
   gateway-1:
     image: lamba92/face-detector-stack.gateway:1.0-SNAPSHOT
@@ -62,4 +98,22 @@ services:
       DETECTOR_HOSTNAME: "detection-4:50051"
       EXTRACTOR_HOSTNAME: "extraction-4:50051"
       EMBEDDER_HOSTNAME: "embedding-4:50051"
+
+  gateway-5:
+    image: lamba92/face-detector-stack.gateway:1.0-SNAPSHOT
+    ports:
+      - 50055:50051
+    environment:
+      DETECTOR_HOSTNAME: "detection-5:50051"
+      EXTRACTOR_HOSTNAME: "extraction-5:50051"
+      EMBEDDER_HOSTNAME: "embedding-5:50051"
+
+  gateway-6:
+    image: lamba92/face-detector-stack.gateway:1.0-SNAPSHOT
+    ports:
+      - 50056:50051
+    environment:
+      DETECTOR_HOSTNAME: "detection-6:50051"
+      EXTRACTOR_HOSTNAME: "extraction-6:50051"
+      EMBEDDER_HOSTNAME: "embedding-6:50051"
 

@@ -20,7 +20,7 @@ def file_path_to_b64(path: str):
 def row_to_data(row, client):
     try:
         file_1 = row["file1"]
-        file_2 = row["file1"]
+        file_2 = row["file2"]
         file_1 = file_path_to_b64(f"{images_location}{file_1}")
         file_2 = file_path_to_b64(f"{images_location}{file_2}")
         response = client.elaborate(GatewayRequest(
@@ -29,31 +29,26 @@ def row_to_data(row, client):
         input_ = list(response.elements[0].data[0].array) + list(response.elements[1].data[0].array)
         output = (0, 1) if row["class"] == 1 else (1, 0)
         return pandas.Series(
-            data=[input_, output, row["file1"], row["file1"], row["class"]],
+            data=[input_, output, row["file1"], row["file2"], row["class"]],
             index=["input", "output", "file1", "file2", "class"]
         )
     except:
-        logging.error(f"{row['file1']} or {row['file2']} errored")
+        logging.error(f"#{row['index']} | {row['file1']} or {row['file2']} errored")
         return pandas.Series(
-            data=[None, None, row["file1"], row["file1"], row["class"]],
+            data=[None, None, row["file1"], row["file2"], row["class"]],
             index=["input", "output", "file1", "file2", "class"]
         )
 
 
-def elaborate(step, step_size_, parts, df, gateway_client):
-    if not os.path.isfile(f"./dataset/step_{step + 1}_of_{parts}_part3.pkl"):
-        print(f"Starting step #{step + 1} of {parts}")
-        start_index = step_size_ * step
-        end_index = start_index + step_size_
-
-        step_dataset = df.iloc[start_index:end_index]
-        step_dataset = step_dataset.apply(lambda row: row_to_data(row, gateway_client), axis=1)
-        step_dataset.to_pickle(f"./dataset/step_{step + 1}_of_{parts}_part3.pkl", protocol=4, compression='zip')
-
-
-def elaborate2(start, step_size_, parts, df, gateway_client):
-    for i in range(start, parts):
-        elaborate(i, step_size_, parts, df, gateway_client)
+def elaborate(start, stop, df, gateway_client):
+    step = int((stop-start)/10)
+    for start_index in range(start, stop, step):
+        end_index = start_index + step
+        if not os.path.isfile(f"./dataset/step_from_{start_index}_to_{end_index}.pkl"):
+            print(f"Starting step from #{start_index} to #{end_index}")
+            current_df = df.iloc[start_index:end_index]
+            current_df = current_df.apply(lambda row: row_to_data(row, gateway_client), axis=1)
+            current_df.to_pickle(f"./dataset/step_from_{start_index}_to_{end_index}.pkl", protocol=4, compression='zip')
 
 
 if __name__ == '__main__':
@@ -63,59 +58,30 @@ if __name__ == '__main__':
         names=["file1", "file2", "class"]
     )
 
-    training_dataset = training_dataset[training_dataset["class"] == 0].iloc[25000:50000] \
-        .append(training_dataset[training_dataset["class"] == 1].iloc[25000:50000]) \
+    training_dataset = training_dataset[training_dataset["class"] == 0].head(75000) \
+        .append(training_dataset[training_dataset["class"] == 1].head(75000)) \
         .reset_index()
 
     items_count = len(training_dataset.index)
-    parts = 100
+    parts = 6
     step_size = int(items_count / parts)
 
-    threads = [
-        Thread(
-            target=functools.partial(
-                elaborate2,
-                start=7,
-                step_size_=step_size,
-                parts=8,
-                df=training_dataset,
-                gateway_client=GatewayStub(insecure_channel('localhost:50052'))
-            )
-        ),
-        Thread(
-            target=functools.partial(
-                elaborate2,
-                start=8,
-                step_size_=step_size,
-                parts=9,
-                df=training_dataset,
-                gateway_client=GatewayStub(insecure_channel('localhost:50053'))
-            )
-        ),
-        Thread(
-            target=functools.partial(
-                elaborate2,
-                start=9,
-                step_size_=step_size,
-                parts=10,
-                df=training_dataset,
-                gateway_client=GatewayStub(insecure_channel('localhost:50054'))
-            )
-        ),
-        Thread(
-            target=functools.partial(
-                elaborate2,
-                start=20,
-                step_size_=step_size,
-                parts=25,
-                df=training_dataset,
-                gateway_client=GatewayStub(insecure_channel('localhost:50051'))
+    threads = []
+
+    for i in range(0, parts):
+        threads.append(
+            Thread(
+                target=elaborate,
+                args=(
+                    i * step_size,
+                    (i + 1) * step_size,
+                    training_dataset,
+                    GatewayStub(insecure_channel(f'localhost:5005{i + 1}'))
+                )
             )
         )
-    ]
 
     for t in threads:
         t.start()
     for t in threads:
         t.join()
-
