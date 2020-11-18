@@ -10,7 +10,7 @@ from tensorflow.keras.models import Model
 # noinspection PyMethodMayBeStatic
 class ComparisonApp(ComparisonServicer):
 
-    model: Model = load_model("model.h5", compile=False)
+    model: Model = load_model("pinsir-net.h5", compile=False)
 
     def prediction_to_result(self, prediction) -> ComparisonResult:
         return ComparisonResult(
