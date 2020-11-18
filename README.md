@@ -64,6 +64,7 @@ services:
 
 ```
 
+# Maven [ ![Download](https://api.bintray.com/packages/lamba92/com.github.lamba92/pinsir/images/download.svg) ](https://bintray.com/lamba92/com.github.lamba92/pinsir/_latestVersion)
 JVM clients and Kotlin extension function utils available at Maven. Gradle Kotlin DSL:
 ```kotlin
 repositories {
