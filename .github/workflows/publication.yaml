@@ -28,5 +28,5 @@ jobs:
         with:
           arguments: publish
         env:
-          BINTRAYAPIKEY: ${{secrets.BINTRAYAPIKEY}}
-          BINTRAYUSERNAME: ${{secrets.BINTRAYUSERNAME}}
+          BINTRAY_API_KEY: ${{secrets.BINTRAYAPIKEY}}
+          BINTRAY_USERNAME: ${{secrets.BINTRAYUSERNAME}}
