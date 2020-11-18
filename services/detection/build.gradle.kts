@@ -7,15 +7,17 @@ docker {
     files(".")
 }
 
+val dockerBuildxSetup by rootProject.tasks.getting(DockerBuildxSetup::class)
+
 tasks {
     register<DockerBuildx>("dockerBuildx") {
         group = "docker"
-        dependsOn(dockerPrepare)
+        dependsOn(dockerPrepare, dockerBuildxSetup)
         context = dockerPrepare.get().destinationDir
     }
     register<DockerBuildx>("dockerBuildxPublish") {
         group = "docker"
-        dependsOn(dockerPrepare)
+        dependsOn(dockerPrepare, dockerBuildxSetup)
         imageName = "lamba92/$imageName"
         context = dockerPrepare.get().destinationDir
         publish = true

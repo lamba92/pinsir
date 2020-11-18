@@ -20,4 +20,3 @@ tasks {
 }
 
 val dockerBuildxSetup by tasks.registering(DockerBuildxSetup::class)
-

@@ -1,10 +1,10 @@
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
-import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.*
 import java.io.File
+import java.lang.System.getenv
 
 open class DockerBuildx : DefaultTask() {
 
@@ -28,6 +28,10 @@ open class DockerBuildx : DefaultTask() {
     @get:Input
     var publish by project.objects.property<Boolean>()
         .apply { set(false) }
+
+    @get:Input
+    var quiet by project.objects.property<Boolean>()
+        .apply { set(getenv("CI")?.toBoolean() == true) }
 
     @get:Input
     var imageVersion by project.objects.property<String>()
@@ -56,6 +60,8 @@ open class DockerBuildx : DefaultTask() {
                 add("--platform=${architectures.get().joinToString(",") { "linux/${it.platformIdentifier}" }}")
                 if (publish)
                     add("--push")
+                if (quiet)
+                    add("-q")
                 add(context.absolutePath)
             }
         }
@@ -72,7 +78,7 @@ open class DockerBuildxSetup : DefaultTask() {
     fun setup(): Unit = with(project) {
         exec {
             executable = "docker"
-            args = listOf("buildx create --use")
+            args = listOf("buildx", "create", "--use")
         }
     }
 
