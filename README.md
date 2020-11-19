@@ -20,6 +20,8 @@ Identity recognition requires different steps that need to be framed independent
 
 All containers communicate through gRPC generated from proto files available [here](/data/src/main/proto). While Kotlin/JVM and Java artifacts are available on my Maven repository (instructions below), the Python declarations are not wrapped as a library. To build them copy the proto files and run `protoc` on your own or clone the project and [run](/data/build.gradle.kts#L88) `./gradlew :data:generatePythonDefinitions` which will be available in `data/build/grpc/python`.
 
+The training notebooks for the networks inside the Comparison service are available [here](https://drive.google.com/drive/folders/1Wp03oWdYvvwJXd8MGw58vewsGFpdglRM?usp=sharing)
+
 # Docker images
 
 Images are available for AMD64, ARM32 and ARM64. Tested on AMD64 only.
