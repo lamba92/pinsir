@@ -87,16 +87,19 @@ class TestFlow {
 
     @Test
     fun `test same person image`() = runBlocking {
-        val image = getTestImage(8)
-        val result = gatewayApp.comparePortraits(image, image)
-        println("Confidence: ${result.confidence}")
-        assertTrue(result.isSame)
+        val r = (0..9).map {
+            val image = getTestImage(it + 1)
+            gatewayApp.comparePortraits(image, image)
+        }.onEachIndexed { idx, result ->
+            println("isSame: ${result.isSame} | Confidence for #${idx + 1}: ${result.confidence}")
+        }
+        assertTrue(r.all { it.isSame })
     }
 
     @Test
     fun `test different person images`() = runBlocking {
         val image = getTestImage(1)
-        val image2 = getTestImage(10)
+        val image2 = getTestImage(9)
         val result = gatewayApp.comparePortraits(image, image2)
         println("Confidence: ${result.confidence}")
         assertFalse(result.isSame)

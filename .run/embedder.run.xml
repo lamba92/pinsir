@@ -4,7 +4,7 @@
     <option name="PARENT_ENVS" value="true" />
     <envs>
       <env name="PYTHONUNBUFFERED" value="1" />
-      <env name="TF_FORCE_GPU_ALLOW_GROWTH" value="true" />
+      <env name="CUDA_VISIBLE_DEVICES" value="-1" />
       <env name="PORT" value="50052" />
     </envs>
     <option name="SDK_HOME" value="D:\Dev\Python\3.8.6\python.exe" />

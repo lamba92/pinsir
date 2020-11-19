@@ -21,8 +21,8 @@ def select_model_name():
 
 # noinspection PyMethodMayBeStatic
 class ComparisonApp(ComparisonServicer):
-
-    model: Model = load_model(select_model_name(), compile=False)
+    model_name = select_model_name()
+    model: Model = load_model(model_name, compile=True)
 
     def prediction_to_result(self, prediction) -> ComparisonResult:
         return ComparisonResult(
@@ -35,11 +35,17 @@ class ComparisonApp(ComparisonServicer):
         x = list(map(lambda el: list(el.array), x))
         return np.asarray(x)
 
+    def simple_input_transformation(self, x_a, x_b):
+        x = map(lambda e: np.concatenate([e[0], e[1]]), zip(x_a, x_b))
+        x = list(x)
+        return np.asarray(x)
+
     def compare(self, request: ComparisonRequest, context) -> ComparisonResponse:
         x_a = self.embeddings_to_numpy(request.embeddings)
         x_b = self.embeddings_to_numpy(request.other_embeddings)
+        x = [x_a, x_b] if self.model_name == "complex_saved.h5" else self.simple_input_transformation(x_a, x_b)
         predictions = list(map(
             self.prediction_to_result,
-            self.model.predict([x_a, x_b])
+            self.model.predict(x)
         ))
         return ComparisonResponse(results=predictions)
