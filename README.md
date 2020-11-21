@@ -24,7 +24,7 @@ The training notebooks for the networks inside the Comparison service are availa
 
 # Docker images
 
-Images are available for AMD64, ARM32 and ARM64. Tested on AMD64 only.
+Images are available for AMD64, ARM32 and ARM64. Working on AMD64 only! Need help to build opencv and pillow in dockerfile, PR are welcomes!
 
 - Detection:  [`lamba92/pinsir.detection:latest`](https://hub.docker.com/repository/docker/lamba92/pinsir.detection)
 - Extraction: [`lamba92/pinsir.extraction:latest`](https://hub.docker.com/repository/docker/lamba92/pinsir.extraction)
